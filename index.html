@@ -100,7 +100,28 @@
         /* Firefox-specific: Increase tint opacity for better visibility */
         @supports (-moz-appearance:none) {
             .liquidGlass-tint {
-                background: rgba(255, 255, 255, 0.25);
+                background: rgba(0, 0, 0, 0.3); /* Changed to dark tint */
+            }
+
+            /* Additional glass effect adjustments for Firefox */
+            .liquidGlass-shine {
+                box-shadow: inset 2px 2px 1px 0 rgba(255, 255, 255, 0.3),
+                    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.3);
+            }
+
+            .liquidGlass-effect {
+                backdrop-filter: blur(15px);
+                background: rgba(0, 0, 0, 0.1); /* Added slight dark background */
+            }
+
+            /* Specific adjustments for logo container */
+            .image-container .liquidGlass-tint {
+                background: rgba(0, 0, 0, 0.35); /* Slightly darker for logo */
+            }
+
+            /* Specific adjustments for location text */
+            .location-text .liquidGlass-tint {
+                background: rgba(0, 0, 0, 0.4); /* Darker for text readability */
             }
         }
 
@@ -294,7 +315,7 @@
                         <img src="https://img.icons8.com/ios-filled/100/ffffff/instagram-new.png" alt="Instagram icon" />
                     </a>
                     <a href="https://maps.app.goo.gl/NgESRx7zxSSRDKFSA" target="_blank" rel="noopener noreferrer">
-                        <img src="https://img.icons8.com/?size=100&id=Hgs4VioSpGBH&format=png&color=FFFFFF" alt="WhatsApp icon" />
+                        <img src="https://img.icons8.com/?size=100&id=Hgs4VioSpGBH&format=png&color=FFFFFF" alt="Google Maps icon" />
                     </a>
                 </div>
             </div>
