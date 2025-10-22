@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleepless Grounds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles */
+        body {
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* New background image that is tiled and scrolls */
+            background-image: url('https://raw.githubusercontent.com/irfanarif00/sleeplessgrounds/main/Gemini_Generated_Image_lnuodjlnuodjlnuoinvert.png');
+            /* Font that closely matches the logo */
+            font-family: 'Anton', sans-serif;
+            overflow-x: hidden; /* Prevents horizontal scroll */
+            animation: scrollBackground 60s linear infinite; /* Add scrolling animation */
+        }
+        
+        /* Keyframes for the scrolling background */
+        @keyframes scrollBackground {
+            from {
+                background-position: 0 0;
+            }
+            to {
+                /* A large value creates a slow, seamless scroll for the tiled pattern */
+                background-position: -1000px -1000px;
+            }
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .wrapper {
+            display: flex;
+            gap: 25px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center; /* Centered all items */
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            perspective: 1000px; /* Added for 3D effect context */
+        }
+
+        /* LIQUID GLASS STYLES */
+        .liquidGlass-wrapper {
+            position: relative;
+            display: flex;
+            font-weight: 600;
+            overflow: hidden;
+            color: black;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 0 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+        }
+
+        .liquidGlass-effect {
+            position: absolute;
+            z-index: 0;
+            inset: 0;
+            backdrop-filter: blur(4px); /* Slightly increased blur */
+            filter: url(#glass-distortion);
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .liquidGlass-tint {
+            z-index: 1;
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.15); /* Reduced opacity for darker bg */
+        }
+
+        .liquidGlass-shine {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            overflow: hidden;
+            box-shadow: inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5),
+                inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
+        }
+
+        .liquidGlass-text {
+            z-index: 3;
+            color: white; /* Changed to white for better contrast */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* LOGO CONTAINER STYLES */
+        .image-container,
+        .image-container > .liquidGlass-effect,
+        .image-container > .liquidGlass-tint,
+        .image-container > .liquidGlass-shine {
+            border-radius: 2.5rem;
+        }
+
+        .image-container {
+            padding: 1rem;
+            transition: transform 0.1s linear; /* Smooth transition for the tilt effect */
+            transform-style: preserve-3d;
+        }
+
+        .image-container img {
+            width: 200px; /* Adjusted size */
+            height: auto;
+        }
+
+
+        /* DOCK STYLES */
+        .dock,
+        .dock > .liquidGlass-effect,
+        .dock > .liquidGlass-tint,
+        .dock > .liquidGlass-shine {
+            border-radius: 2rem;
+        }
+
+        .dock {
+             cursor: default;
+        }
+        
+        .dock .liquidGlass-text {
+            width: 100%;
+        }
+        
+        .dock .liquidGlass-text .dock-inner {
+             display: flex;
+             align-items: center;
+             justify-content: center; /* Changed to center the icons as a group */
+             gap: 20px; /* Added a gap between the icons */
+             padding: 0.6rem;
+             width: 100%;
+             box-sizing: border-box;
+        }
+
+        .dock img {
+            width: 50px; /* Adjusted size */
+            padding: 0;
+            transition: transform 0.2s ease-out;
+        }
+        
+        .dock a:hover img {
+             transform: scale(1.1); /* Add scale to the image on hover */
+        }
+
+
+        /* RESPONSIVE STYLES */
+        @media (max-width: 768px) {
+            .wrapper {
+                gap: 20px;
+            }
+
+            .image-container img {
+                width: 180px;
+            }
+
+            .dock .liquidGlass-text .dock-inner {
+                padding: 0.5rem;
+                gap: 15px; /* Adjusted gap for tablets */
+            }
+
+            .dock img {
+                width: 45px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .wrapper {
+                padding: 15px;
+                gap: 15px;
+            }
+            
+            .image-container img {
+                width: 150px;
+            }
+
+            .dock .liquidGlass-text .dock-inner {
+                 padding: 0.4rem;
+                 gap: 10px;
+            }
+
+            .dock img {
+                width: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main content wrapper -->
+    <div class="wrapper">
+        <!-- Image logo component -->
+        <div class="liquidGlass-wrapper image-container">
+            <div class="liquidGlass-effect"></div>
+            <div class="liquidGlass-tint"></div>
+            <div class="liquidGlass-shine"></div>
+            <div class="liquidGlass-text">
+               <img src="https://raw.githubusercontent.com/irfanarif00/sleeplessgrounds/main/photo_2025-10-22_01-34-48-removebg-preview%20(1).png" alt="Sleepless Grounds Logo">
+            </div>
+        </div>
+
+        <!-- Dock component -->
+        <div class="liquidGlass-wrapper dock">
+            <div class="liquidGlass-effect"></div>
+            <div class="liquidGlass-tint"></div>
+            <div class="liquidGlass-shine"></div>
+            <div class="liquidGlass-text">
+                <div class="dock-inner">
+                    <a href="https://www.facebook.com/share/1LySeapZ63/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">
+                        <img src="https://img.icons8.com/ios-filled/100/ffffff/facebook-new.png" alt="Facebook icon" />
+                    </a>
+                    <a href="https://www.instagram.com/sleeplessgrounds?igsh=MTYwc3pkbXIyZjVzMA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">
+                        <img src="https://img.icons8.com/ios-filled/100/ffffff/instagram-new.png" alt="Instagram icon" />
+                    </a>
+                    <a href="https://www.whatsapp.com" target="_blank" rel="noopener noreferrer">
+                        <img src="https://img.icons8.com/ios-filled/100/ffffff/whatsapp--v1.png" alt="WhatsApp icon" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SVG filter for the glass effect -->
+    <svg style="display: none">
+        <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+            <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="5" result="turbulence" />
+            <feComponentTransfer in="turbulence" result="mapped">
+                <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+                <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+                <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+            </feComponentTransfer>
+            <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+            <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lighting-color="white" result="specLight">
+                <fePointLight x="-200" y="-200" z="300" />
+            </feSpecularLighting>
+            <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+            <feDisplacementMap in="SourceGraphic" in2="softMap" scale="150" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+    </svg>
+
+    <!-- JavaScript for 3D tilt and layout -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoContainer = document.querySelector('.image-container');
+            const dockContainer = document.querySelector('.dock');
+
+            // Function to make the dock width match the logo container width
+            function matchWidths() {
+                if (logoContainer && dockContainer) {
+                    const logoWidth = logoContainer.offsetWidth;
+                    dockContainer.style.width = `${logoWidth}px`;
+                }
+            }
+
+            // Run on initial load and resize
+            matchWidths();
+            window.addEventListener('resize', matchWidths);
+
+            // 3D tilt effect for mouse hover on desktop
+            logoContainer.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = logoContainer.getBoundingClientRect();
+                const mouseX = e.clientX - left;
+                const mouseY = e.clientY - top;
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const deltaX = mouseX - centerX;
+                const deltaY = mouseY - centerY;
+                const maxTilt = 15;
+                const tiltX = (deltaY / centerY) * -maxTilt;
+                const tiltY = (deltaX / centerX) * maxTilt;
+
+                logoContainer.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+            });
+
+            logoContainer.addEventListener('mouseleave', () => {
+                logoContainer.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+            });
+            
+            // 3D tilt effect for accelerometer on mobile
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', (event) => {
+                    const { beta, gamma } = event; // beta: front-to-back, gamma: left-to-right
+
+                    if (logoContainer && beta !== null && gamma !== null) {
+                        const maxTilt = 15;
+                        const motionRange = 30; // Device tilt in degrees to reach max element tilt
+
+                        // Clamp the device's tilt values for a controlled effect
+                        const clampedBeta = Math.max(Math.min(beta, motionRange), -motionRange);
+                        const clampedGamma = Math.max(Math.min(gamma, motionRange), -motionRange);
+                        
+                        // Map device tilt to element rotation
+                        const tiltX = (clampedBeta / motionRange) * maxTilt;
+                        const tiltY = (clampedGamma / motionRange) * maxTilt;
+
+                        // Use requestAnimationFrame for smooth visual updates
+                        window.requestAnimationFrame(() => {
+                            logoContainer.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
