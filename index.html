@@ -153,6 +153,44 @@
         }
 
 
+        /* LOCATION TEXT STYLES */
+        .location-text,
+        .location-text > .liquidGlass-effect,
+        .location-text > .liquidGlass-tint,
+        .location-text > .liquidGlass-shine {
+            border-radius: 1rem;
+        }
+
+        .location-text {
+            padding: 0.8rem 1.5rem;
+        }
+
+        .location-text p {
+            margin: 0;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* Update responsive styles */
+        @media (max-width: 768px) {
+            .location-text {
+                padding: 0.6rem 1.2rem;
+            }
+            .location-text p {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .location-text {
+                padding: 0.5rem 1rem;
+            }
+            .location-text p {
+                font-size: 0.8rem;
+            }
+        }
+
         /* RESPONSIVE STYLES */
         @media (max-width: 768px) {
             .wrapper {
@@ -204,6 +242,16 @@
             <div class="liquidGlass-shine"></div>
             <div class="liquidGlass-text">
                <img src="https://raw.githubusercontent.com/irfanarif00/sleeplessgrounds/main/photo_2025-10-22_01-34-48-removebg-preview%20(1).png" alt="Sleepless Grounds Logo">
+            </div>
+        </div>
+
+        <!-- Location text component -->
+        <div class="liquidGlass-wrapper location-text">
+            <div class="liquidGlass-effect"></div>
+            <div class="liquidGlass-tint"></div>
+            <div class="liquidGlass-shine"></div>
+            <div class="liquidGlass-text">
+                <p>Visit our pop-up at #60 San Pedro, Bustos, Bulacan 3007</p>
             </div>
         </div>
 
