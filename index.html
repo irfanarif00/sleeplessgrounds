@@ -334,26 +334,56 @@
             
             // 3D tilt effect for accelerometer on mobile
             if (window.DeviceOrientationEvent) {
-                window.addEventListener('deviceorientation', (event) => {
-                    const { beta, gamma } = event; // beta: front-to-back, gamma: left-to-right
+                let initialBeta = null;
+                let initialGamma = null;
+                
+                // Function to handle orientation changes
+                const handleOrientation = (event) => {
+                    const { beta, gamma } = event;
 
                     if (logoContainer && beta !== null && gamma !== null) {
-                        const maxTilt = 15;
-                        const motionRange = 30; // Device tilt in degrees to reach max element tilt
+                        // Set initial values on first reading
+                        if (initialBeta === null || initialGamma === null) {
+                            initialBeta = beta;
+                            initialGamma = gamma;
+                            return;
+                        }
 
-                        // Clamp the device's tilt values for a controlled effect
-                        const clampedBeta = Math.max(Math.min(beta, motionRange), -motionRange);
-                        const clampedGamma = Math.max(Math.min(gamma, motionRange), -motionRange);
+                        const maxTilt = 15;
+                        const motionRange = 30;
+
+                        // Calculate relative tilt from initial position
+                        const relativeBeta = beta - initialBeta;
+                        const relativeGamma = gamma - initialGamma;
+
+                        // Clamp the relative tilt values
+                        const clampedBeta = Math.max(Math.min(relativeBeta, motionRange), -motionRange);
+                        const clampedGamma = Math.max(Math.min(relativeGamma, motionRange), -motionRange);
                         
-                        // Map device tilt to element rotation
+                        // Map relative tilt to element rotation
                         const tiltX = (clampedBeta / motionRange) * maxTilt;
                         const tiltY = (clampedGamma / motionRange) * maxTilt;
 
-                        // Use requestAnimationFrame for smooth visual updates
-                        window.requestAnimationFrame(() => {
-                            logoContainer.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-                        });
+                        // Apply smooth transition
+                        logoContainer.style.transition = 'transform 0.1s ease-out';
+                        logoContainer.style.transform = `perspective(1000px) rotateX(${-tiltX}deg) rotateY(${tiltY}deg)`;
                     }
+                };
+
+                // Reset initial values when device moves significantly
+                const resetInitialPosition = () => {
+                    initialBeta = null;
+                    initialGamma = null;
+                };
+
+                // Add event listeners
+                window.addEventListener('deviceorientation', handleOrientation);
+                
+                // Reset position after significant movement
+                let resetTimer;
+                window.addEventListener('deviceorientation', () => {
+                    clearTimeout(resetTimer);
+                    resetTimer = setTimeout(resetInitialPosition, 2000);
                 });
             }
         });
