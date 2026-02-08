@@ -305,12 +305,60 @@
                 width: 40px;
             }
         }
+
+        /* CONTENT CONTAINER */
+         .content-container {
+             display: flex;
+             flex-direction: row;
+             align-items: center;
+             justify-content: center;
+             gap: 40px;
+             width: 100%;
+             max-width: 1400px;
+             padding: 20px;
+             box-sizing: border-box;
+             margin: 0 auto;
+         }
+
+         /* PDF VIEWER STYLES */
+         #pdf-viewer {
+             width: 600px;
+             height: 80vh;
+             min-height: 600px;
+             position: relative;
+             /* Ensure it has the glass effect structure */
+             border-radius: 2rem;
+             overflow: hidden;
+         }
+         
+         /* Override wrapper width in the new flex context */
+         .wrapper {
+             width: auto;
+             flex: 0 0 auto;
+         }
+
+         @media (max-width: 1024px) {
+             .content-container {
+                 flex-direction: column;
+             }
+             
+             .wrapper {
+                 width: 100%;
+             }
+
+             #pdf-viewer {
+                 width: 100%;
+                 max-width: 600px;
+                 height: 600px;
+             }
+         }
     </style>
 </head>
 
 <body>
     <!-- Main content wrapper -->
-    <div class="wrapper">
+    <div class="content-container">
+        <div class="wrapper">
         <!-- Image logo component -->
         <div class="liquidGlass-wrapper image-container">
             <div class="liquidGlass-effect"></div>
@@ -328,7 +376,7 @@
             <div class="liquidGlass-tint"></div>
             <div class="liquidGlass-shine"></div>
             <div class="liquidGlass-text">
-                <p>Visit our pop-up at #60 San Pedro, Bustos, Bulacan 3007</p>
+                <p>Visit our cafe at #60 San Pedro, Bustos, Bulacan 3007</p>
             </div>
         </div>
 
@@ -354,6 +402,17 @@
                     </a>
                 </div>
             </div>
+        </div>
+    </div>
+
+        <!-- PDF Viewer Component -->
+        <div id="pdf-viewer" class="liquidGlass-wrapper">
+             <div class="liquidGlass-effect"></div>
+             <div class="liquidGlass-tint"></div>
+             <div class="liquidGlass-shine"></div>
+             <div class="liquidGlass-text" style="width: 100%; height: 100%; display: block;">
+                 <div id="pdf-embed-container" style="width: 100%; height: 100%;"></div>
+             </div>
         </div>
     </div>
 
@@ -468,6 +527,17 @@
                     resetTimer = setTimeout(resetInitialPosition, 2000);
                 });
             }
+        });
+    </script>
+
+    <!-- PDF Viewer Initialization -->
+    <script async type="module">
+        import EmbedPDF from 'https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js';
+        
+        const viewer = EmbedPDF.init({
+            type: 'container',
+            target: document.getElementById('pdf-embed-container'),
+            src: 'SG%20Menu%20202602.pdf'
         });
     </script>
 </body>
