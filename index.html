@@ -395,6 +395,152 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                  font-size: 1rem;
              }
          }
+
+         /* TAB NAVIGATION STYLES */
+         .tab-navigation {
+             display: flex;
+             justify-content: center;
+             gap: 8px;
+             width: 100%;
+         }
+
+         .tab-button {
+             padding: 0.7rem 2rem;
+             border: none;
+             background: none;
+             cursor: pointer;
+             position: relative;
+             font-family: 'Helvetica', sans-serif;
+             font-size: 1rem;
+             font-weight: bold;
+             color: rgba(255, 255, 255, 0.6);
+             transition: all 0.3s ease;
+         }
+
+         .tab-button.liquidGlass-wrapper {
+             border-radius: 1rem 1rem 0 0;
+         }
+
+         .tab-button:hover {
+             color: white;
+         }
+
+         .tab-button.active {
+             color: white;
+             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+         }
+
+         .tab-button.active > .liquidGlass-tint {
+             background: rgba(0, 0, 0, 0.7);
+         }
+
+         .tab-content-area {
+             width: 100%;
+         }
+
+         .tab-content {
+             display: none;
+             width: 100%;
+         }
+
+         .tab-content.active {
+             display: block;
+         }
+
+         /* SUB-TAB STYLES */
+         .sub-tab-navigation {
+             display: flex;
+             justify-content: center;
+             gap: 8px;
+             margin-bottom: 15px;
+             flex-wrap: wrap;
+         }
+
+         .sub-tab-button {
+             padding: 0.5rem 1rem;
+             border: none;
+             background: none;
+             cursor: pointer;
+             position: relative;
+             font-family: 'Helvetica', sans-serif;
+             font-size: 0.85rem;
+             font-weight: 600;
+             color: rgba(255, 255, 255, 0.6);
+             transition: all 0.3s ease;
+         }
+
+         .sub-tab-button.liquidGlass-wrapper {
+             border-radius: 0.8rem;
+         }
+
+         .sub-tab-button:hover {
+             color: white;
+         }
+
+         .sub-tab-button.active {
+             color: white;
+             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+         }
+
+         .sub-tab-button.active > .liquidGlass-tint {
+             background: rgba(0, 0, 0, 0.7);
+         }
+
+         .sub-tab-content {
+             display: none;
+             width: 100%;
+         }
+
+         .sub-tab-content.active {
+             display: flex;
+             justify-content: center;
+             align-items: center;
+         }
+
+         /* VIDEO PLAYER STYLES */
+         .video-container {
+             width: 100%;
+             max-width: 400px;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+         }
+
+         .video-container video {
+             width: 100%;
+             height: auto;
+             max-height: 80vh;
+             border-radius: 1rem;
+             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+         }
+
+         .directions-section {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             gap: 15px;
+             width: 100%;
+         }
+
+         @media (max-width: 768px) {
+             .tab-button {
+                 padding: 0.6rem 1.5rem;
+                 font-size: 0.9rem;
+             }
+
+             .sub-tab-button {
+                 padding: 0.4rem 0.8rem;
+                 font-size: 0.8rem;
+             }
+
+             .video-container {
+                 max-width: 100%;
+             }
+
+             .video-container video {
+                 max-height: 70vh;
+             }
+         }
     </style>
 </head>
 
@@ -451,26 +597,103 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
     </div>
-        <!-- PDF Menu Section -->
+
+        <!-- Tabbed Content Section -->
         <div class="pdf-section">
-            <!-- Menu Title -->
-            <div class="liquidGlass-wrapper menu-title">
-                <div class="liquidGlass-effect"></div>
-                <div class="liquidGlass-tint"></div>
-                <div class="liquidGlass-shine"></div>
-                <div class="liquidGlass-text">
-                    <p>Feb 2026 Menu</p>
-                </div>
+            <!-- Main Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="liquidGlass-wrapper tab-button active" onclick="switchTab('menu')">
+                    <div class="liquidGlass-effect"></div>
+                    <div class="liquidGlass-tint"></div>
+                    <div class="liquidGlass-shine"></div>
+                    <span class="liquidGlass-text">Menu</span>
+                </button>
+                <button class="liquidGlass-wrapper tab-button" onclick="switchTab('directions')">
+                    <div class="liquidGlass-effect"></div>
+                    <div class="liquidGlass-tint"></div>
+                    <div class="liquidGlass-shine"></div>
+                    <span class="liquidGlass-text">Directions</span>
+                </button>
             </div>
 
-            <!-- PDF Viewer Component -->
-            <div id="pdf-viewer" class="liquidGlass-wrapper">
-                 <div class="liquidGlass-effect"></div>
-                 <div class="liquidGlass-tint"></div>
-                 <div class="liquidGlass-shine"></div>
-                 <div class="liquidGlass-text" style="width: 100%; height: 100%; display: block;">
-                     <div id="pdf-embed-container" style="width: 100%; height: 100%;"></div>
-                 </div>
+            <!-- Tab Content Area -->
+            <div class="tab-content-area">
+                <!-- Menu Tab Content -->
+                <div id="menu-tab" class="tab-content active">
+                    <!-- Menu Title -->
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;">
+                        <div class="liquidGlass-wrapper menu-title">
+                            <div class="liquidGlass-effect"></div>
+                            <div class="liquidGlass-tint"></div>
+                            <div class="liquidGlass-shine"></div>
+                            <div class="liquidGlass-text">
+                                <p>Feb 2026 Menu</p>
+                            </div>
+                        </div>
+                        <!-- PDF Viewer Component -->
+                        <div id="pdf-viewer" class="liquidGlass-wrapper">
+                            <div class="liquidGlass-effect"></div>
+                            <div class="liquidGlass-tint"></div>
+                            <div class="liquidGlass-shine"></div>
+                            <div class="liquidGlass-text" style="width: 100%; height: 100%; display: block;">
+                                <div id="pdf-embed-container" style="width: 100%; height: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Directions Tab Content -->
+                <div id="directions-tab" class="tab-content">
+                    <div class="directions-section">
+                        <!-- Sub-tab Navigation -->
+                        <div class="sub-tab-navigation">
+                            <button class="liquidGlass-wrapper sub-tab-button active" onclick="switchSubTab('bustos')">
+                                <div class="liquidGlass-effect"></div>
+                                <div class="liquidGlass-tint"></div>
+                                <div class="liquidGlass-shine"></div>
+                                <span class="liquidGlass-text">From Bustos Public Market</span>
+                            </button>
+                            <button class="liquidGlass-wrapper sub-tab-button" onclick="switchSubTab('tibag')">
+                                <div class="liquidGlass-effect"></div>
+                                <div class="liquidGlass-tint"></div>
+                                <div class="liquidGlass-shine"></div>
+                                <span class="liquidGlass-text">From Tibag, Baliwag</span>
+                            </button>
+                            <button class="liquidGlass-wrapper sub-tab-button" onclick="switchSubTab('stoNino')">
+                                <div class="liquidGlass-effect"></div>
+                                <div class="liquidGlass-tint"></div>
+                                <div class="liquidGlass-shine"></div>
+                                <span class="liquidGlass-text">From Sto Niño Parish Church</span>
+                            </button>
+                        </div>
+
+                        <!-- Sub-tab Content -->
+                        <div id="bustos-video" class="sub-tab-content active">
+                            <div class="video-container">
+                                <video controls playsinline muted>
+                                    <source src="Directions%20From%20Bustos%20Public%20Market.MP4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                        <div id="tibag-video" class="sub-tab-content">
+                            <div class="video-container">
+                                <video controls playsinline muted>
+                                    <source src="Directions%20From%20From%20Tibag%2C%20Baliwag.MP4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                        <div id="stoNino-video" class="sub-tab-content">
+                            <div class="video-container">
+                                <video controls playsinline muted>
+                                    <source src="Directions%20From%20Sto%20Ni%C3%B1o%20Parish%20Church.MP4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -587,6 +810,61 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 });
             }
         });
+    </script>
+
+    <!-- Tab Switching Logic -->
+    <script>
+        function switchTab(tabName) {
+            // Deactivate all tabs and content
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Activate selected tab and content
+            const tabMap = { 'menu': 'menu-tab', 'directions': 'directions-tab' };
+            document.getElementById(tabMap[tabName]).classList.add('active');
+
+            // Activate the clicked button
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => {
+                if (btn.querySelector('.liquidGlass-text').textContent.toLowerCase() === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Pause all videos when switching away from directions
+            if (tabName !== 'directions') {
+                document.querySelectorAll('.directions-section video').forEach(v => v.pause());
+            } else {
+                // Autoplay the active sub-tab video
+                const activeVideo = document.querySelector('.sub-tab-content.active video');
+                if (activeVideo) activeVideo.play();
+            }
+        }
+
+        function switchSubTab(tabName) {
+            // Deactivate all sub-tabs and content
+            document.querySelectorAll('.sub-tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.sub-tab-content').forEach(content => content.classList.remove('active'));
+
+            // Pause all videos
+            document.querySelectorAll('.directions-section video').forEach(v => v.pause());
+
+            // Activate selected sub-tab and content
+            const activePanel = document.getElementById(tabName + '-video');
+            activePanel.classList.add('active');
+
+            // Autoplay the newly active video
+            const activeVideo = activePanel.querySelector('video');
+            if (activeVideo) activeVideo.play();
+
+            // Activate the clicked button
+            const subTabMap = { 'bustos': 'From Bustos Public Market', 'tibag': 'From Tibag, Baliwag', 'stoNino': 'From Sto Niño Parish Church' };
+            document.querySelectorAll('.sub-tab-button').forEach(btn => {
+                if (btn.querySelector('.liquidGlass-text').textContent === subTabMap[tabName]) {
+                    btn.classList.add('active');
+                }
+            });
+        }
     </script>
 
     <!-- PDF Viewer Initialization -->
