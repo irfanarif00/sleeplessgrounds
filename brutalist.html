@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-P3JDP8R5');</script>
+    <!-- End Google Tag Manager -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLEEPLESS GROUNDS — CAFE</title>
+    <meta name="description" content="Sleepless Grounds — A brutalist cafe open 2PM–2AM daily in Bustos, Bulacan. Raw concrete, industrial lighting, coffee & art.">
+
+    <!-- ============================================
+         TYPOGRAPHY: Structural signage + data log
+         Oswald (condensed sans) = architectural headers
+         JetBrains Mono = raw data / receipt aesthetic
+    ============================================= -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* =============================================
+           DESIGN SYSTEM: "WARM BRUTALISM"
+           =============================================
+           Background: Near-black charcoal (#0a0a0a)
+           Text:       Off-white (#E0E0E0)
+           Accent:     Tungsten Amber (#FFC107)
+           Edges:      0px radius — raw, structural
+           Grid:       1px separator lines (low opacity)
+        ============================================= */
+
+        /* --- CSS RESET & BASE --- */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-surface: #121212;
+            --bg-elevated: #1A1A1A;
+            --text-primary: #E0E0E0;
+            --text-secondary: #888888;
+            --accent: #FFC107;
+            --accent-hover: #ffb300;
+            --grid-line: rgba(255, 255, 255, 0.08);
+            --border-accent: 1px solid #FFC107;
+            --font-display: 'Oswald', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* Subtle noise texture via SVG data-uri */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        a:hover {
+            color: var(--text-primary);
+        }
+
+        /* --- SECTION GRID LINES --- */
+        /* Each section separated by thin engineered lines */
+        .section-divider {
+            width: 100%;
+            height: 1px;
+            background: var(--grid-line);
+        }
+
+        section {
+            border-bottom: 1px solid var(--grid-line);
+        }
+
+        /* =============================================
+           A. HERO — "BROKEN WALL" SECTION
+           =============================================
+           Jagged clip-path mimics a broken concrete
+           opening in the cafe's facade.
+        ============================================= */
+        .hero {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: var(--bg-primary);
+        }
+
+        /* Concrete texture overlay */
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(255, 193, 7, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 30%, rgba(255, 193, 7, 0.02) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* The "broken wall" opening — jagged polygon clip-path */
+        .hero-broken-wall {
+            position: relative;
+            width: 80vw;
+            max-width: 900px;
+            height: 50vh;
+            min-height: 350px;
+            background: var(--bg-elevated);
+            /* Jagged, irregular polygon to mimic smashed concrete */
+            clip-path: polygon(
+                5% 0%, 12% 3%, 18% 0%, 25% 4%, 30% 1%,
+                38% 5%, 45% 0%, 52% 3%, 58% 0%, 65% 2%,
+                72% 0%, 78% 5%, 85% 1%, 92% 4%, 100% 0%,
+                100% 8%, 97% 15%, 100% 22%, 98% 30%,
+                100% 38%, 97% 45%, 100% 55%, 98% 62%,
+                100% 70%, 97% 78%, 100% 85%, 98% 92%, 100% 100%,
+                92% 100%, 85% 96%, 78% 100%, 72% 97%,
+                65% 100%, 58% 96%, 50% 100%, 42% 97%,
+                35% 100%, 28% 96%, 20% 100%, 12% 97%, 5% 100%, 0% 100%,
+                0% 92%, 3% 85%, 0% 78%, 2% 70%,
+                0% 62%, 3% 55%, 0% 45%, 2% 38%,
+                0% 30%, 3% 22%, 0% 15%, 2% 8%
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 3rem;
+            border: none;
+            /* Inner ambient glow */
+            box-shadow: inset 0 0 120px rgba(255, 193, 7, 0.06);
+        }
+
+        /* Warm light leak inside the "opening" */
+        .hero-broken-wall::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(
+                ellipse at center,
+                rgba(255, 193, 7, 0.08) 0%,
+                transparent 70%
+            );
+            pointer-events: none;
+        }
+
+        .hero-broken-wall-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            z-index: 1;
+        }
+
+        .hero-logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+            filter: brightness(1.1);
+        }
+
+        /* Massive structural heading */
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-mono);
+            font-size: clamp(0.75rem, 1.5vw, 1rem);
+            color: var(--accent);
+            letter-spacing: 0.15em;
+            font-weight: 400;
+        }
+
+        /* Social links inside hero broken wall */
+        .hero-social-links {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero-social-links a {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            transition: color 0.2s ease;
+            text-decoration: none;
+        }
+
+        .hero-social-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Button group for MENU / DIRECTIONS */
+        .hero-btn-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .scroll-indicator span {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: var(--accent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.3; transform: scaleY(0.5); }
+            50% { opacity: 1; transform: scaleY(1); }
+        }
+
+
+        /* =============================================
+           B. MARQUEE — Infinite horizontal scroller
+           =============================================
+           "OPEN 2PM–2AM /// SLEEP IS FOR THE WEAK"
+           Amber monospaced text, raw & relentless.
+        ============================================= */
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            padding: 1.2rem 0;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--grid-line);
+            border-bottom: 1px solid var(--grid-line);
+        }
+
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            animation: marqueeScroll 25s linear infinite;
+        }
+
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+
+        .marquee-text {
+            font-family: var(--font-display);
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            text-transform: uppercase;
+            color: var(--accent);
+            letter-spacing: 0.08em;
+            white-space: nowrap;
+            padding-right: 4rem;
+            font-weight: 500;
+        }
+
+        .marquee-text .separator {
+            color: var(--text-secondary);
+            margin: 0 1.5rem;
+        }
+
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+
+        /* =============================================
+           C. ABOUT / INFO GRID
+           =============================================
+           Engineered data grid — like reading a
+           building's spec sheet.
+        ============================================= */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .info-cell {
+            padding: 3rem 2rem;
+            border-right: 1px solid var(--grid-line);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .info-cell:last-child {
+            border-right: none;
+        }
+
+        .info-cell-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .info-cell-value {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            line-height: 1.1;
+        }
+
+        .info-cell-detail {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+
+        /* =============================================
+           D. MENU — Image Gallery
+           =============================================
+           Menu displayed as inverted images to blend
+           seamlessly into the dark UI.
+        ============================================= */
+        .menu-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .section-header-line {
+            flex: 1;
+            height: 1px;
+            background: var(--grid-line);
+        }
+
+        /* File-system tab header for the menu container */
+        .file-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-elevated);
+            border: var(--border-accent);
+            border-bottom: none;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .file-tab-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .menu-images-container {
+            border: var(--border-accent);
+            background: var(--bg-elevated);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .menu-images-container img {
+            width: 100%;
+            display: block;
+            /* Invert white menu images to dark mode */
+            filter: invert(1) hue-rotate(180deg);
+        }
+
+
+        /* =============================================
+           E. BLUEPRINT IMAGE PLACEHOLDERS
+           =============================================
+           CSS-only wireframe placeholders with diagonal
+           "X" like architectural blueprints.
+        ============================================= */
+        .gallery-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .blueprint-placeholder {
+            position: relative;
+            background: var(--bg-elevated);
+            border: var(--border-accent);
+            aspect-ratio: 4 / 3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            /* Diagonal X lines — architectural wireframe */
+            background-image:
+                linear-gradient(
+                    to bottom right,
+                    transparent calc(50% - 0.5px),
+                    rgba(255, 193, 7, 0.15) calc(50% - 0.5px),
+                    rgba(255, 193, 7, 0.15) calc(50% + 0.5px),
+                    transparent calc(50% + 0.5px)
+                ),
+                linear-gradient(
+                    to top right,
+                    transparent calc(50% - 0.5px),
+                    rgba(255, 193, 7, 0.15) calc(50% - 0.5px),
+                    rgba(255, 193, 7, 0.15) calc(50% + 0.5px),
+                    transparent calc(50% + 0.5px)
+                );
+            background-color: var(--bg-elevated);
+        }
+
+        .blueprint-placeholder span {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            background: var(--bg-elevated);
+            padding: 0.3rem 0.8rem;
+            z-index: 1;
+        }
+
+        /* =============================================
+           F. DIRECTIONS — Video Tab Navigation
+           =============================================
+           Brutalist tab UI for switching direction
+           videos. Sharp edges, amber highlights.
+        ============================================= */
+        .directions-section {
+            padding: 4rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .brutal-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+            flex-wrap: wrap;
+        }
+
+        .brutal-tab {
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--grid-line);
+            border-bottom: none;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            /* Brutalist: no rounded corners */
+            border-radius: 0;
+        }
+
+        .brutal-tab:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        .brutal-tab.active {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+            font-weight: 700;
+        }
+
+        .tab-panel {
+            display: none;
+            border: var(--border-accent);
+            padding: 2rem;
+            background: var(--bg-surface);
+        }
+
+        .tab-panel.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-panel video {
+            width: 100%;
+            max-width: 480px;
+            max-height: 75vh;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+
+        /* =============================================
+           G. FOOTER
+           =============================================
+           Minimal. Data-log aesthetic.
+        ============================================= */
+        .site-footer {
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .footer-col:last-child {
+            text-align: right;
+            justify-content: flex-end;
+        }
+
+        .footer-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .footer-value {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            border-bottom-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--grid-line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-bottom span {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+        }
+
+        .footer-bottom a {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            transition: color 0.2s ease;
+        }
+
+        .footer-bottom a:hover {
+            color: var(--accent);
+        }
+
+
+        /* =============================================
+           BRUTALIST BUTTONS
+           =============================================
+           Sharp edges. Amber border. On hover,
+           fills amber, text goes black.
+        ============================================= */
+        .btn-brutal {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 2rem;
+            background: transparent;
+            border: var(--border-accent);
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            cursor: pointer;
+            /* Brutalist: absolutely no rounding */
+            border-radius: 0;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+
+        .btn-brutal:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+        }
+
+
+        /* =============================================
+           RESPONSIVE BREAKPOINTS
+        ============================================= */
+        @media (max-width: 1024px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-cell {
+                border-right: none;
+                border-bottom: 1px solid var(--grid-line);
+                padding: 2rem;
+            }
+
+            .info-cell:last-child {
+                border-bottom: none;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-broken-wall {
+                width: 92vw;
+                height: auto;
+                min-height: 380px;
+            }
+
+            .hero-social-links {
+                padding: 0 1.5rem;
+                gap: 1rem;
+            }
+
+            .hero-social-links a {
+                font-size: 0.6rem;
+            }
+
+            .gallery-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .site-footer {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-col:last-child {
+                text-align: left;
+            }
+
+            .brutal-tabs {
+                flex-direction: column;
+            }
+
+            .brutal-tab {
+                border-bottom: 1px solid var(--grid-line);
+            }
+
+            .tab-panel {
+                padding: 1rem;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: clamp(2.5rem, 12vw, 4rem);
+            }
+
+            .info-cell {
+                padding: 1.5rem 1rem;
+            }
+
+            .menu-section,
+            .gallery-section,
+            .directions-section {
+                padding: 2.5rem 1rem;
+            }
+
+            .site-footer {
+                padding: 2rem 1rem;
+            }
+        }
+
+        /* =============================================
+           PAGE LOAD ANIMATION
+           =============================================
+           Subtle fade-in for each section on scroll.
+        ============================================= */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P3JDP8R5"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
+
+    <!-- =============================================
+         A. HERO — "BROKEN WALL" SECTION
+         The cafe facade: a massive jagged opening
+         in raw concrete, revealing warmth inside.
+    ============================================= -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <!-- Broken concrete opening via clip-path -->
+            <div class="hero-broken-wall">
+                <div class="hero-broken-wall-inner">
+                    <img class="hero-logo"
+                         src="logo-cropped.png"
+                         alt="Sleepless Grounds Logo">
+                    <h1 class="hero-title">Sleepless<br>Grounds</h1>
+                    <p class="hero-subtitle">EST. 2026 // BUSTOS, BULACAN</p>
+                    <div class="hero-social-links">
+                        <a href="https://www.facebook.com/share/1LySeapZ63/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">Facebook</a>
+                        <a href="https://www.instagram.com/sleeplessgrounds?igsh=MTYwc3pkbXIyZjVzMA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+                        <a href="https://maps.app.goo.gl/RPZ6Ko1cc4BzerpH7" target="_blank" rel="noopener noreferrer">Google Maps</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-btn-group">
+                <a href="#menu" class="btn-brutal">
+                    MENU ↓
+                </a>
+                <a href="#directions" class="btn-brutal">
+                    DIRECTIONS ↓
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+
+    <!-- =============================================
+         B. MARQUEE — Infinite horizontal scroller
+         Relentless amber text. Never stops. Like
+         the cafe itself.
+    ============================================= -->
+    <div class="marquee-container">
+        <div class="marquee-track" id="marquee-track">
+            <!-- Duplicated for seamless infinite loop -->
+        </div>
+    </div>
+
+
+    <!-- =============================================
+         INFO GRID — Building spec sheet
+    ============================================= -->
+    <section class="info-grid fade-in" id="about">
+        <div class="info-cell">
+            <span class="info-cell-label">// Status</span>
+            <span class="info-cell-value">2PM – 2AM</span>
+            <span class="info-cell-detail">
+                Open daily. No excuses.<br>
+                Coffee flows through the night.
+            </span>
+        </div>
+        <div class="info-cell">
+            <span class="info-cell-label">// Location</span>
+            <span class="info-cell-value">Bustos, Bulacan</span>
+            <span class="info-cell-detail">
+                San Pedro, Bustos,<br>
+                Bulacan 3007, Philippines
+            </span>
+        </div>
+        <div class="info-cell">
+            <span class="info-cell-label">// Concept</span>
+            <span class="info-cell-value">Coffee & Art</span>
+            <span class="info-cell-detail">
+                Raw concrete. Industrial lighting.<br>
+                A space for the sleepless.
+            </span>
+        </div>
+    </section>
+
+
+    <!-- =============================================
+         D. MENU — Image Gallery
+         Menu images with inversion filter to blend
+         into the dark brutalist UI.
+    ============================================= -->
+    <section id="menu">
+        <div class="menu-section fade-in">
+            <!-- Section header -->
+            <div class="section-header">
+                <span class="section-header-label">// 02 — Menu</span>
+                <div class="section-header-line"></div>
+            </div>
+
+            <!-- File-system tab styling -->
+            <div class="file-tab">
+                <span class="file-tab-dot"></span>
+                FILE: SG_MENU_202602.PNG
+            </div>
+
+            <!-- Menu images with inversion filter -->
+            <div class="menu-images-container">
+                <img src="menu-images/menu-page-0.png"
+                     alt="Sleepless Grounds Menu — Page 1"
+                     loading="lazy">
+                <img src="menu-images/menu-page-1.png"
+                     alt="Sleepless Grounds Menu — Page 2"
+                     loading="lazy">
+            </div>
+        </div>
+    </section>
+
+
+    <!-- =============================================
+         E. DIRECTIONS — Video Tabs
+         Brutalist tab UI for direction videos.
+         Sharp edges, amber on active.
+    ============================================= -->
+    <section id="directions">
+        <div class="directions-section fade-in">
+            <!-- Section header -->
+            <div class="section-header">
+                <span class="section-header-label">// 03 — Directions</span>
+                <div class="section-header-line"></div>
+            </div>
+
+            <!-- Tab navigation -->
+            <div class="brutal-tabs">
+                <button class="brutal-tab active" data-tab="bustos" onclick="switchDirectionTab('bustos')">
+                    From Bustos Public Market
+                </button>
+                <button class="brutal-tab" data-tab="tibag" onclick="switchDirectionTab('tibag')">
+                    From Tibag, Baliwag
+                </button>
+                <button class="brutal-tab" data-tab="stoNino" onclick="switchDirectionTab('stoNino')">
+                    From Sto Niño Parish Church
+                </button>
+            </div>
+
+            <!-- Tab panels -->
+            <div id="panel-bustos" class="tab-panel active">
+                <video controls playsinline muted>
+                    <source src="Directions%20From%20Bustos%20Public%20Market.MP4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div id="panel-tibag" class="tab-panel">
+                <video controls playsinline muted>
+                    <source src="Directions%20From%20From%20Tibag%2C%20Baliwag.MP4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div id="panel-stoNino" class="tab-panel">
+                <video controls playsinline muted>
+                    <source src="Directions%20From%20Sto%20Ni%C3%B1o%20Parish%20Church.MP4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- =============================================
+         F. GALLERY — Blueprint Placeholders
+         CSS-only wireframe boxes. No photos yet.
+         Diagonal "X" lines like architectural drafts.
+    ============================================= -->
+    <section id="gallery">
+        <div class="gallery-section fade-in">
+            <!-- Section header -->
+            <div class="section-header">
+                <span class="section-header-label">// 04 — Gallery</span>
+                <div class="section-header-line"></div>
+            </div>
+
+            <div class="gallery-grid">
+                <div class="blueprint-placeholder">
+                    <span>[ IMG_SOURCE_PENDING ]</span>
+                </div>
+                <div class="blueprint-placeholder">
+                    <span>[ IMG_SOURCE_PENDING ]</span>
+                </div>
+                <div class="blueprint-placeholder">
+                    <span>[ IMG_SOURCE_PENDING ]</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- =============================================
+         G. FOOTER
+    ============================================= -->
+    <footer>
+        <div class="site-footer">
+            <div class="footer-col">
+                <span class="footer-label">// Address</span>
+                <span class="footer-value">San Pedro, Bustos, Bulacan 3007</span>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 2026 SLEEPLESS GROUNDS. ALL RIGHTS RESERVED.</span>
+            <a href="index.html">← ORIGINAL SITE</a>
+        </div>
+    </footer>
+
+
+    <!-- =============================================
+         JAVASCRIPT
+         - Marquee text generation (seamless loop)
+         - Direction tab switching
+         - Scroll-triggered fade-in animations
+    ============================================= -->
+    <script>
+        // ---- MARQUEE: Generate duplicated text for seamless infinite scroll ----
+        (function initMarquee() {
+            const track = document.getElementById('marquee-track');
+            const phrase = 'OPEN 2PM–2AM <span class="separator">///</span> SLEEP IS FOR THE WEAK <span class="separator">///</span> COFFEE & ART <span class="separator">///</span> ';
+            // Repeat enough times to fill the viewport twice (for seamless loop)
+            const repeatCount = 8;
+            let html = '';
+            for (let i = 0; i < repeatCount; i++) {
+                html += `<span class="marquee-text">${phrase}</span>`;
+            }
+            track.innerHTML = html;
+        })();
+
+
+        // ---- DIRECTION TAB SWITCHING ----
+        function switchDirectionTab(tabName) {
+            // Deactivate all tabs and panels
+            document.querySelectorAll('.brutal-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => {
+                p.classList.remove('active');
+                // Pause all videos when switching
+                const video = p.querySelector('video');
+                if (video) video.pause();
+            });
+
+            // Activate selected tab and panel
+            document.querySelector(`.brutal-tab[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`panel-${tabName}`).classList.add('active');
+        }
+
+
+        // ---- SCROLL-TRIGGERED FADE-IN ----
+        (function initScrollFade() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        })();
+    </script>
+</body>
+
+</html>
