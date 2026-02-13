@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P3JDP8R5');</script>
+<!-- End Google Tag Manager -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleepless Grounds</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles */
+        body {
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* New background image that is tiled and scrolls */
+            background-image: url('https://raw.githubusercontent.com/irfanarif00/sleeplessgrounds/main/background image.png');
+            background-size: auto;
+            /* Ensure original resolution */
+            background-repeat: repeat;
+            /* Ensure tiling */
+            /* Font that closely matches the logo */
+            font-family: 'Helvetica', sans-serif;
+            overflow-x: hidden;
+            /* Prevents horizontal scroll */
+            animation: scrollBackground 60s linear infinite;
+            /* Add scrolling animation */
+        }
+
+        /* Keyframes for the scrolling background */
+        @keyframes scrollBackground {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                /* A large value creates a slow, seamless scroll for the tiled pattern */
+                background-position: -1000px -1000px;
+            }
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .wrapper {
+            display: flex;
+            gap: 25px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* Centered all items */
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            perspective: 1000px;
+            /* Added for 3D effect context */
+        }
+
+        /* LIQUID GLASS STYLES */
+        .liquidGlass-wrapper {
+            position: relative;
+            display: flex;
+            font-weight: 300;
+            overflow: hidden;
+            color: black;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 0 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.5);
+        }
+
+        .liquidGlass-effect {
+            position: absolute;
+            z-index: 0;
+            inset: 0;
+            backdrop-filter: blur(8px);
+            /* Increased blur for better visibility */
+            -webkit-backdrop-filter: blur(8px);
+            /* Safari support */
+            filter: url(#glass-distortion);
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        /* Firefox-specific: Remove SVG filter and increase backdrop blur */
+        @supports (-moz-appearance:none) {
+            .liquidGlass-effect {
+                filter: none;
+                /* Remove SVG filter for Firefox */
+                backdrop-filter: blur(12px);
+                /* Stronger blur for Firefox */
+                -webkit-backdrop-filter: blur(12px);
+            }
+        }
+
+        /* Fallback for browsers that don't support backdrop-filter */
+        @supports not (backdrop-filter: blur(8px)) {
+            .liquidGlass-effect {
+                background: rgba(255, 255, 255, 0.3);
+                filter: none;
+            }
+        }
+
+        .liquidGlass-tint {
+            z-index: 1;
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.15);
+            /* Reduced opacity for darker bg */
+        }
+
+        /* Firefox-specific: Increase tint opacity for better visibility */
+        @supports (-moz-appearance:none) {
+            .liquidGlass-tint {
+                background: rgba(0, 0, 0, 0.3);
+                /* Changed to dark tint */
+            }
+
+            /* Additional glass effect adjustments for Firefox */
+            .liquidGlass-shine {
+                box-shadow: inset 2px 2px 1px 0 rgba(255, 255, 255, 0.3),
+                    inset -1px -1px 1px 1px rgba(255, 255, 255, 0.3);
+            }
+
+            .liquidGlass-effect {
+                backdrop-filter: blur(15px);
+                background: rgba(0, 0, 0, 0.1);
+                /* Added slight dark background */
+            }
+
+            /* Specific adjustments for logo container */
+            .image-container .liquidGlass-tint {
+                background: rgba(0, 0, 0, 0.35);
+                /* Slightly darker for logo */
+            }
+
+            /* Specific adjustments for location text */
+            .location-text .liquidGlass-tint {
+                background: rgba(0, 0, 0, 0.4);
+                /* Darker for text readability */
+            }
+        }
+
+        .liquidGlass-shine {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            overflow: hidden;
+            box-shadow: inset 2px 2px 1px 0 rgba(255, 255, 255, 0.5),
+                inset -1px -1px 1px 1px rgba(255, 255, 255, 0.5);
+        }
+
+        .liquidGlass-text {
+            z-index: 3;
+            color: white;
+            /* Changed to white for better contrast */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* LOGO CONTAINER STYLES */
+        .image-container,
+        .image-container>.liquidGlass-effect,
+        .image-container>.liquidGlass-tint,
+        .image-container>.liquidGlass-shine {
+            border-radius: 2.5rem;
+        }
+
+        .image-container {
+            padding: 1rem;
+            transition: transform 0.1s linear;
+            /* Smooth transition for the tilt effect */
+            transform-style: preserve-3d;
+        }
+
+        .image-container img {
+            width: 200px;
+            /* Adjusted size */
+            height: auto;
+        }
+
+
+        /* DOCK STYLES */
+        .dock,
+        .dock>.liquidGlass-effect,
+        .dock>.liquidGlass-tint,
+        .dock>.liquidGlass-shine {
+            border-radius: 2rem;
+        }
+
+        .dock {
+            cursor: default;
+        }
+
+        .dock .liquidGlass-text {
+            width: 100%;
+        }
+
+        .dock .liquidGlass-text .dock-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Changed to center the icons as a group */
+            gap: 20px;
+            /* Added a gap between the icons */
+            padding: 0.6rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .dock img {
+            width: 50px;
+            /* Adjusted size */
+            padding: 0;
+            transition: transform 0.2s ease-out;
+        }
+
+        .dock a:hover img {
+            transform: scale(1.1);
+            /* Add scale to the image on hover */
+        }
+
+
+        /* LOCATION TEXT STYLES */
+        .location-text,
+        .location-text>.liquidGlass-effect,
+        .location-text>.liquidGlass-tint,
+        .location-text>.liquidGlass-shine {
+            border-radius: 1rem;
+        }
+
+        .location-text {
+            padding: 0.8rem 1.5rem;
+        }
+
+        .location-text p {
+            margin: 0;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* Update responsive styles */
+        @media (max-width: 768px) {
+            .location-text {
+                padding: 0.6rem 1.2rem;
+            }
+
+            .location-text p {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .location-text {
+                padding: 0.5rem 1rem;
+            }
+
+            .location-text p {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* RESPONSIVE STYLES */
+        @media (max-width: 768px) {
+            .wrapper {
+                gap: 20px;
+            }
+
+            .image-container img {
+                width: 180px;
+            }
+
+            .dock .liquidGlass-text .dock-inner {
+                padding: 0.5rem;
+                gap: 15px;
+                /* Adjusted gap for tablets */
+            }
+
+            .dock img {
+                width: 45px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .wrapper {
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .image-container img {
+                width: 150px;
+            }
+
+            .dock .liquidGlass-text .dock-inner {
+                padding: 0.4rem;
+                gap: 10px;
+            }
+
+            .dock img {
+                width: 40px;
+            }
+        }
+
+        /* CONTENT CONTAINER */
+         .content-container {
+             display: flex;
+             flex-direction: row;
+             flex-wrap: wrap;
+             align-items: center;
+             justify-content: center;
+             gap: 40px;
+             width: 100%;
+             max-width: 1400px;
+             padding: 20px;
+             box-sizing: border-box;
+             margin: 0 auto;
+         }
+
+         /* PDF VIEWER STYLES */
+         #pdf-viewer {
+             width: 600px;
+             height: 80vh;
+             min-height: 600px;
+             position: relative;
+             /* Ensure it has the glass effect structure */
+             border-radius: 2rem;
+             overflow: hidden;
+         }
+         
+         /* Override wrapper width in the new flex context */
+         .wrapper {
+             width: auto;
+             flex: 0 0 auto;
+         }
+
+         /* PDF Section container */
+         .pdf-section {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             gap: 15px;
+         }
+
+         /* MENU TITLE STYLES */
+         .menu-title,
+         .menu-title>.liquidGlass-effect,
+         .menu-title>.liquidGlass-tint,
+         .menu-title>.liquidGlass-shine {
+             border-radius: 1rem;
+         }
+
+         .menu-title {
+             padding: 0.8rem 1.5rem;
+         }
+
+         .menu-title p {
+             margin: 0;
+             color: white;
+             font-size: 1.2rem;
+             font-weight: bold;
+             text-align: center;
+         }
+
+         @media (max-width: 1024px) {
+             .content-container {
+                 flex-direction: column;
+             }
+             
+             .wrapper {
+                 width: 100%;
+             }
+
+             .pdf-section {
+                 width: 100%;
+             }
+
+             #pdf-viewer {
+                 width: 100%;
+                 max-width: none;
+                 height: 600px;
+             }
+
+             .menu-title p {
+                 font-size: 1rem;
+             }
+         }
+
+         /* TAB NAVIGATION STYLES */
+         .tab-navigation {
+             display: flex;
+             justify-content: center;
+             gap: 8px;
+             width: 100%;
+         }
+
+         .tab-button {
+             padding: 0.7rem 2rem;
+             border: none;
+             background: none;
+             cursor: pointer;
+             position: relative;
+             font-family: 'Helvetica', sans-serif;
+             font-size: 1rem;
+             font-weight: bold;
+             color: rgba(255, 255, 255, 0.6);
+             transition: all 0.3s ease;
+         }
+
+         .tab-button.liquidGlass-wrapper {
+             border-radius: 1rem 1rem 0 0;
+         }
+
+         .tab-button:hover {
+             color: white;
+         }
+
+         .tab-button.active {
+             color: white;
+             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+         }
+
+         .tab-button.active > .liquidGlass-tint {
+             background: rgba(0, 0, 0, 0.7);
+         }
+
+         .tab-content-area {
+             width: 100%;
+         }
+
+         .tab-content {
+             display: none;
+             width: 100%;
+         }
+
+         .tab-content.active {
+             display: block;
+         }
+
+         /* SUB-TAB STYLES */
+         .sub-tab-navigation {
+             display: flex;
+             justify-content: center;
+             gap: 8px;
+             margin-bottom: 15px;
+             flex-wrap: wrap;
+         }
+
+         .sub-tab-button {
+             padding: 0.5rem 1rem;
+             border: none;
+             background: none;
+             cursor: pointer;
+             position: relative;
+             font-family: 'Helvetica', sans-serif;
+             font-size: 0.85rem;
+             font-weight: 600;
+             color: rgba(255, 255, 255, 0.6);
+             transition: all 0.3s ease;
+         }
+
+         .sub-tab-button.liquidGlass-wrapper {
+             border-radius: 0.8rem;
+         }
+
+         .sub-tab-button:hover {
+             color: white;
+         }
+
+         .sub-tab-button.active {
+             color: white;
+             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+         }
+
+         .sub-tab-button.active > .liquidGlass-tint {
+             background: rgba(0, 0, 0, 0.7);
+         }
+
+         .sub-tab-content {
+             display: none;
+             width: 100%;
+         }
+
+         .sub-tab-content.active {
+             display: flex;
+             justify-content: center;
+             align-items: center;
+         }
+
+         /* VIDEO PLAYER STYLES */
+         .video-container {
+             width: 100%;
+             max-width: 400px;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+         }
+
+         .video-container video {
+             width: 100%;
+             height: auto;
+             max-height: 80vh;
+             border-radius: 1rem;
+             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+         }
+
+         .directions-section {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             gap: 15px;
+             width: 100%;
+         }
+
+         @media (max-width: 768px) {
+             .tab-button {
+                 padding: 0.6rem 1.5rem;
+                 font-size: 0.9rem;
+             }
+
+             .sub-tab-button {
+                 padding: 0.4rem 0.8rem;
+                 font-size: 0.8rem;
+             }
+
+             .video-container {
+                 max-width: 100%;
+             }
+
+             .video-container video {
+                 max-height: 70vh;
+             }
+         }
+    </style>
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P3JDP8R5"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+    <!-- Main content wrapper -->
+    <div class="content-container">
+        <div class="wrapper">
+        <!-- Image logo component -->
+        <div class="liquidGlass-wrapper image-container">
+            <div class="liquidGlass-effect"></div>
+            <div class="liquidGlass-tint"></div>
+            <div class="liquidGlass-shine"></div>
+            <div class="liquidGlass-text">
+                <img src="https://raw.githubusercontent.com/irfanarif00/sleeplessgrounds/main/photo_2025-10-22_01-34-48-removebg-preview%20(1).png"
+                    alt="Sleepless Grounds Logo">
+            </div>
+        </div>
+
+        <!-- Location text component -->
+        <div class="liquidGlass-wrapper location-text">
+            <div class="liquidGlass-effect"></div>
+            <div class="liquidGlass-tint"></div>
+            <div class="liquidGlass-shine"></div>
+            <div class="liquidGlass-text">
+                <p>Visit our cafe at San Pedro, Bustos, Bulacan 3007</p>
+            </div>
+        </div>
+
+        <!-- Dock component -->
+        <div class="liquidGlass-wrapper dock">
+            <div class="liquidGlass-effect"></div>
+            <div class="liquidGlass-tint"></div>
+            <div class="liquidGlass-shine"></div>
+            <div class="liquidGlass-text">
+                <div class="dock-inner">
+                    <a href="https://www.facebook.com/share/1LySeapZ63/?mibextid=wwXIfr" target="_blank"
+                        rel="noopener noreferrer">
+                        <img src="https://img.icons8.com/ios-filled/100/ffffff/facebook-new.png" alt="Facebook icon" />
+                    </a>
+                    <a href="https://www.instagram.com/sleeplessgrounds?igsh=MTYwc3pkbXIyZjVzMA%3D%3D&utm_source=qr"
+                        target="_blank" rel="noopener noreferrer">
+                        <img src="https://img.icons8.com/ios-filled/100/ffffff/instagram-new.png"
+                            alt="Instagram icon" />
+                    </a>
+                    <a href="https://maps.app.goo.gl/RPZ6Ko1cc4BzerpH7" target="_blank" rel="noopener noreferrer">
+                        <img src="https://img.icons8.com/?size=100&id=Hgs4VioSpGBH&format=png&color=FFFFFF"
+                            alt="Google Maps icon" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Tabbed Content Section -->
+        <div class="pdf-section">
+            <!-- Main Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="liquidGlass-wrapper tab-button active" onclick="switchTab('menu')">
+                    <div class="liquidGlass-effect"></div>
+                    <div class="liquidGlass-tint"></div>
+                    <div class="liquidGlass-shine"></div>
+                    <span class="liquidGlass-text">Menu</span>
+                </button>
+                <button class="liquidGlass-wrapper tab-button" onclick="switchTab('directions')">
+                    <div class="liquidGlass-effect"></div>
+                    <div class="liquidGlass-tint"></div>
+                    <div class="liquidGlass-shine"></div>
+                    <span class="liquidGlass-text">Directions</span>
+                </button>
+            </div>
+
+            <!-- Tab Content Area -->
+            <div class="tab-content-area">
+                <!-- Menu Tab Content -->
+                <div id="menu-tab" class="tab-content active">
+                    <!-- Menu Title -->
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;">
+                        <div class="liquidGlass-wrapper menu-title">
+                            <div class="liquidGlass-effect"></div>
+                            <div class="liquidGlass-tint"></div>
+                            <div class="liquidGlass-shine"></div>
+                            <div class="liquidGlass-text">
+                                <p>Feb 2026 Menu</p>
+                            </div>
+                        </div>
+                        <!-- PDF Viewer Component -->
+                        <div id="pdf-viewer" class="liquidGlass-wrapper">
+                            <div class="liquidGlass-effect"></div>
+                            <div class="liquidGlass-tint"></div>
+                            <div class="liquidGlass-shine"></div>
+                            <div class="liquidGlass-text" style="width: 100%; height: 100%; display: block;">
+                                <div id="pdf-embed-container" style="width: 100%; height: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Directions Tab Content -->
+                <div id="directions-tab" class="tab-content">
+                    <div class="directions-section">
+                        <!-- Sub-tab Navigation -->
+                        <div class="sub-tab-navigation">
+                            <button class="liquidGlass-wrapper sub-tab-button active" onclick="switchSubTab('bustos')">
+                                <div class="liquidGlass-effect"></div>
+                                <div class="liquidGlass-tint"></div>
+                                <div class="liquidGlass-shine"></div>
+                                <span class="liquidGlass-text">From Bustos Public Market</span>
+                            </button>
+                            <button class="liquidGlass-wrapper sub-tab-button" onclick="switchSubTab('tibag')">
+                                <div class="liquidGlass-effect"></div>
+                                <div class="liquidGlass-tint"></div>
+                                <div class="liquidGlass-shine"></div>
+                                <span class="liquidGlass-text">From Tibag, Baliwag</span>
+                            </button>
+                            <button class="liquidGlass-wrapper sub-tab-button" onclick="switchSubTab('stoNino')">
+                                <div class="liquidGlass-effect"></div>
+                                <div class="liquidGlass-tint"></div>
+                                <div class="liquidGlass-shine"></div>
+                                <span class="liquidGlass-text">From Sto Niño Parish Church</span>
+                            </button>
+                        </div>
+
+                        <!-- Sub-tab Content -->
+                        <div id="bustos-video" class="sub-tab-content active">
+                            <div class="video-container">
+                                <video controls playsinline muted>
+                                    <source src="Directions%20From%20Bustos%20Public%20Market.MP4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                        <div id="tibag-video" class="sub-tab-content">
+                            <div class="video-container">
+                                <video controls playsinline muted>
+                                    <source src="Directions%20From%20From%20Tibag%2C%20Baliwag.MP4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                        <div id="stoNino-video" class="sub-tab-content">
+                            <div class="video-container">
+                                <video controls playsinline muted>
+                                    <source src="Directions%20From%20Sto%20Ni%C3%B1o%20Parish%20Church.MP4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Link to Brutalist version -->
+        <div style="width: 100%; text-align: center; padding: 1.5rem 0;">
+            <a href="index.html"
+               style="font-family: 'Helvetica', sans-serif; font-size: 0.75rem; color: rgba(255,255,255,0.4); text-decoration: none; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s ease;"
+               onmouseover="this.style.color='rgba(255,193,7,0.8)'"
+               onmouseout="this.style.color='rgba(255,255,255,0.4)'">
+                ◼ VIEW BRUTALIST VERSION
+            </a>
+        </div>
+    </div>
+
+    <!-- SVG filter for the glass effect (not used in Firefox) -->
+    <svg style="display: none">
+        <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+            <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" seed="5" result="turbulence" />
+            <feComponentTransfer in="turbulence" result="mapped">
+                <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+                <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+                <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+            </feComponentTransfer>
+            <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+            <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100"
+                lighting-color="white" result="specLight">
+                <fePointLight x="-200" y="-200" z="300" />
+            </feSpecularLighting>
+            <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+            <feDisplacementMap in="SourceGraphic" in2="softMap" scale="150" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+    </svg>
+
+    <!-- JavaScript for 3D tilt and layout -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoContainer = document.querySelector('.image-container');
+            const dockContainer = document.querySelector('.dock');
+
+            // Function to make the dock width match the logo container width
+            function matchWidths() {
+                if (logoContainer && dockContainer) {
+                    const logoWidth = logoContainer.offsetWidth;
+                    dockContainer.style.width = `${logoWidth}px`;
+                }
+            }
+
+            // Run on initial load and resize
+            matchWidths();
+            window.addEventListener('resize', matchWidths);
+
+            // 3D tilt effect for mouse hover on desktop
+            logoContainer.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = logoContainer.getBoundingClientRect();
+                const mouseX = e.clientX - left;
+                const mouseY = e.clientY - top;
+                const centerX = width / 2;
+                const centerY = height / 2;
+                const deltaX = mouseX - centerX;
+                const deltaY = mouseY - centerY;
+                const maxTilt = 15;
+                const tiltX = (deltaY / centerY) * -maxTilt;
+                const tiltY = (deltaX / centerX) * maxTilt;
+
+                logoContainer.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+            });
+
+            logoContainer.addEventListener('mouseleave', () => {
+                logoContainer.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+            });
+
+            // 3D tilt effect for accelerometer on mobile
+            if (window.DeviceOrientationEvent) {
+                let initialBeta = null;
+                let initialGamma = null;
+
+                // Function to handle orientation changes
+                const handleOrientation = (event) => {
+                    const { beta, gamma } = event;
+
+                    if (logoContainer && beta !== null && gamma !== null) {
+                        // Set initial values on first reading
+                        if (initialBeta === null || initialGamma === null) {
+                            initialBeta = beta;
+                            initialGamma = gamma;
+                            return;
+                        }
+
+                        const maxTilt = 15;
+                        const motionRange = 30;
+
+                        // Calculate relative tilt from initial position
+                        const relativeBeta = beta - initialBeta;
+                        const relativeGamma = gamma - initialGamma;
+
+                        // Clamp the relative tilt values
+                        const clampedBeta = Math.max(Math.min(relativeBeta, motionRange), -motionRange);
+                        const clampedGamma = Math.max(Math.min(relativeGamma, motionRange), -motionRange);
+
+                        // Map relative tilt to element rotation
+                        const tiltX = (clampedBeta / motionRange) * maxTilt;
+                        const tiltY = (clampedGamma / motionRange) * maxTilt;
+
+                        // Apply smooth transition
+                        logoContainer.style.transition = 'transform 0.1s ease-out';
+                        logoContainer.style.transform = `perspective(1000px) rotateX(${-tiltX}deg) rotateY(${tiltY}deg)`;
+                    }
+                };
+
+                // Reset initial values when device moves significantly
+                const resetInitialPosition = () => {
+                    initialBeta = null;
+                    initialGamma = null;
+                };
+
+                // Add event listeners
+                window.addEventListener('deviceorientation', handleOrientation);
+
+                // Reset position after significant movement
+                let resetTimer;
+                window.addEventListener('deviceorientation', () => {
+                    clearTimeout(resetTimer);
+                    resetTimer = setTimeout(resetInitialPosition, 2000);
+                });
+            }
+        });
+    </script>
+
+    <!-- Tab Switching Logic -->
+    <script>
+        function switchTab(tabName) {
+            // Deactivate all tabs and content
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Activate selected tab and content
+            const tabMap = { 'menu': 'menu-tab', 'directions': 'directions-tab' };
+            document.getElementById(tabMap[tabName]).classList.add('active');
+
+            // Activate the clicked button
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => {
+                if (btn.querySelector('.liquidGlass-text').textContent.toLowerCase() === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Pause all videos when switching away from directions
+            if (tabName !== 'directions') {
+                document.querySelectorAll('.directions-section video').forEach(v => v.pause());
+            } else {
+                // Autoplay the active sub-tab video
+                const activeVideo = document.querySelector('.sub-tab-content.active video');
+                if (activeVideo) activeVideo.play();
+            }
+        }
+
+        function switchSubTab(tabName) {
+            // Deactivate all sub-tabs and content
+            document.querySelectorAll('.sub-tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.sub-tab-content').forEach(content => content.classList.remove('active'));
+
+            // Pause all videos
+            document.querySelectorAll('.directions-section video').forEach(v => v.pause());
+
+            // Activate selected sub-tab and content
+            const activePanel = document.getElementById(tabName + '-video');
+            activePanel.classList.add('active');
+
+            // Autoplay the newly active video
+            const activeVideo = activePanel.querySelector('video');
+            if (activeVideo) activeVideo.play();
+
+            // Activate the clicked button
+            const subTabMap = { 'bustos': 'From Bustos Public Market', 'tibag': 'From Tibag, Baliwag', 'stoNino': 'From Sto Niño Parish Church' };
+            document.querySelectorAll('.sub-tab-button').forEach(btn => {
+                if (btn.querySelector('.liquidGlass-text').textContent === subTabMap[tabName]) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+    </script>
+
+    <!-- PDF Viewer Initialization -->
+    <script async type="module">
+        import EmbedPDF from 'https://cdn.jsdelivr.net/npm/@embedpdf/snippet@2/dist/embedpdf.js';
+        
+        const viewer = EmbedPDF.init({
+            type: 'container',
+            target: document.getElementById('pdf-embed-container'),
+            src: 'SG%20Menu%20202602.pdf'
+        });
+    </script>
+</body>
+
+</html>
