@@ -107,8 +107,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            /* overflow-x: clip prevents horizontal overflow without breaking position: sticky */
+            overflow-x: clip;
             background: var(--bg-primary);
+            z-index: 1002; /* Stack above fixed header for animation */
         }
 
         /* Concrete texture overlay */
@@ -140,6 +142,16 @@
             max-width: 900px;
             height: 50vh;
             min-height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 3rem;
+            border: none;
+        }
+
+        .hero-broken-wall-bg {
+            position: absolute;
+            inset: 0;
             background: var(--bg-elevated);
             /* Jagged, irregular polygon to mimic smashed concrete */
             clip-path: polygon(
@@ -156,17 +168,13 @@
                 0% 62%, 3% 55%, 0% 45%, 2% 38%,
                 0% 30%, 3% 22%, 0% 15%, 2% 8%
             );
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 3rem;
-            border: none;
             /* Inner ambient glow */
             box-shadow: inset 0 0 120px rgba(255, 193, 7, 0.06);
+            z-index: 0;
         }
 
         /* Warm light leak inside the "opening" */
-        .hero-broken-wall::after {
+        .hero-broken-wall-bg::after {
             content: '';
             position: absolute;
             inset: 0;
@@ -205,6 +213,20 @@
             line-height: 0.9;
             color: var(--text-primary);
             margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-title-line {
+            display: block;
+            line-height: 0.9;
+        }
+
+        #hero-word-sleepless,
+        #hero-word-grounds {
+            display: inline-block;
+            will-change: transform;
         }
 
         .hero-subtitle {
@@ -743,6 +765,21 @@
                 font-size: 0.6rem;
             }
 
+            /* Fixed scroll indicator on mobile so it's always visible on first fold */
+            .scroll-indicator {
+                position: fixed;
+                bottom: 2rem;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 100;
+                transition: opacity 0.4s ease;
+            }
+
+            .scroll-indicator.hidden {
+                opacity: 0;
+                pointer-events: none;
+            }
+
             .gallery-grid {
                 grid-template-columns: 1fr;
             }
@@ -795,19 +832,82 @@
         }
 
         /* =============================================
+           FIXED HEADER BAR
+           =============================================
+           Always position:fixed at top. Starts invisible.
+           GSAP fades it in as the hero brand scrolls away.
+           No sticky→fixed toggle = no reflow snap.
+        ============================================= */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 2rem;
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--grid-line);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .fixed-header.visible {
+            pointer-events: auto;
+        }
+
+        .fixed-header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.625rem;
+        }
+
+        .fixed-header .header-logo {
+            width: 36px;
+            height: auto;
+            opacity: 0.9;
+            filter: brightness(1.1);
+            flex-shrink: 0;
+        }
+
+        .fixed-header .header-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        @media (max-width: 480px) {
+            .fixed-header .header-logo {
+                width: 28px;
+            }
+
+            .fixed-header .header-title {
+                font-size: 1rem;
+            }
+
+            .fixed-header {
+                padding: 0.625rem 1rem;
+            }
+        }
+
+
+        /* =============================================
            PAGE LOAD ANIMATION
            =============================================
-           Subtle fade-in for each section on scroll.
+           Sections start invisible; GSAP ScrollTrigger
+           handles the reveal animation.
         ============================================= */
         .fade-in {
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
+            transform: translateY(30px);
         }
     </style>
 </head>
@@ -819,6 +919,23 @@
     <!-- End Google Tag Manager (noscript) -->
 
 
+    <!-- Fixed header bar — always at top, fades in on scroll -->
+    <div class="fixed-header" id="fixed-header">
+        <div class="fixed-header-inner">
+            <!-- Hidden targets for GSAP to animate TO -->
+            <img class="header-logo"
+                 id="header-logo-target"
+                 src="logo-cropped.png"
+                 alt="Sleepless Grounds Logo"
+                 style="opacity: 0;">
+            <span class="header-title" style="opacity: 0;">
+                <span id="header-word-sleepless">Sleepless</span> 
+                <span id="header-word-grounds">Grounds</span>
+            </span>
+        </div>
+    </div>
+
+
     <!-- =============================================
          A. HERO — "BROKEN WALL" SECTION
          The cafe facade: a massive jagged opening
@@ -828,21 +945,31 @@
         <div class="hero-content">
             <!-- Broken concrete opening via clip-path -->
             <div class="hero-broken-wall">
+                <div class="hero-broken-wall-bg hero-fade"></div>
+                
                 <div class="hero-broken-wall-inner">
-                    <img class="hero-logo"
+                    <!-- The Flying Elements -->
+                    <img class="hero-logo" id="hero-logo"
                          src="logo-cropped.png"
                          alt="Sleepless Grounds Logo">
-                    <h1 class="hero-title">Sleepless<br>Grounds</h1>
-                    <p class="hero-subtitle">EST. 2026 // BUSTOS, BULACAN</p>
-                    <div class="hero-social-links">
-                        <a href="https://www.facebook.com/share/1LySeapZ63/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">Facebook</a>
-                        <a href="https://www.instagram.com/sleeplessgrounds?igsh=MTYwc3pkbXIyZjVzMA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
-                        <a href="https://maps.app.goo.gl/RPZ6Ko1cc4BzerpH7" target="_blank" rel="noopener noreferrer">Google Maps</a>
+                    
+                    <h1 class="hero-title">
+                        <div class="hero-title-line"><span id="hero-word-sleepless">Sleepless</span></div>
+                        <div class="hero-title-line"><span id="hero-word-grounds">Grounds</span></div>
+                    </h1>
+                    
+                    <div class="hero-fade-group hero-fade">
+                        <p class="hero-subtitle">EST. 2026 // BUSTOS, BULACAN</p>
+                        <div class="hero-social-links">
+                            <a href="https://www.facebook.com/share/1LySeapZ63/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">Facebook</a>
+                            <a href="https://www.instagram.com/sleeplessgrounds?igsh=MTYwc3pkbXIyZjVzMA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+                            <a href="https://maps.app.goo.gl/RPZ6Ko1cc4BzerpH7" target="_blank" rel="noopener noreferrer">Google Maps</a>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="hero-btn-group">
+            <div class="hero-btn-group hero-fade">
                 <a href="#menu" class="btn-brutal">
                     MENU ↓
                 </a>
@@ -853,7 +980,7 @@
         </div>
 
         <!-- Scroll indicator -->
-        <div class="scroll-indicator">
+        <div class="scroll-indicator hero-fade">
             <span>Scroll</span>
             <div class="scroll-line"></div>
         </div>
@@ -1029,59 +1156,154 @@
     </footer>
 
 
+    <!-- GSAP + ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
     <!-- =============================================
          JAVASCRIPT
          - Marquee text generation (seamless loop)
          - Direction tab switching
-         - Scroll-triggered fade-in animations
+         - GSAP ScrollTrigger: morph header + fade-ins
     ============================================= -->
     <script>
+        gsap.registerPlugin(ScrollTrigger);
+
         // ---- MARQUEE: Generate duplicated text for seamless infinite scroll ----
         (function initMarquee() {
             const track = document.getElementById('marquee-track');
+            if (!track) return;
             const phrase = 'OPEN 2PM–2AM <span class="separator">///</span> SLEEP IS FOR THE WEAK <span class="separator">///</span> COFFEE & ART <span class="separator">///</span> ';
-            // Repeat enough times to fill the viewport twice (for seamless loop)
             const repeatCount = 8;
-            let html = '';
-            for (let i = 0; i < repeatCount; i++) {
-                html += `<span class="marquee-text">${phrase}</span>`;
-            }
-            track.innerHTML = html;
+            track.innerHTML = Array(repeatCount).fill(`<span class="marquee-text">${phrase}</span>`).join('');
         })();
 
 
         // ---- DIRECTION TAB SWITCHING ----
-        function switchDirectionTab(tabName) {
-            // Deactivate all tabs and panels
+        window.switchDirectionTab = function(tabName) {
             document.querySelectorAll('.brutal-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-panel').forEach(p => {
                 p.classList.remove('active');
-                // Pause all videos when switching
                 const video = p.querySelector('video');
                 if (video) video.pause();
             });
 
-            // Activate selected tab and panel
-            document.querySelector(`.brutal-tab[data-tab="${tabName}"]`).classList.add('active');
-            document.getElementById(`panel-${tabName}`).classList.add('active');
-        }
+            const activeTab = document.querySelector(`.brutal-tab[data-tab="${tabName}"]`);
+            if (activeTab) activeTab.classList.add('active');
+            
+            const activePanel = document.getElementById(`panel-${tabName}`);
+            if (activePanel) activePanel.classList.add('active');
+        };
 
 
-        // ---- SCROLL-TRIGGERED FADE-IN ----
-        (function initScrollFade() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
+        // ---- GSAP: HERO TO STICKY HEADER TRANSFORMATION ----
+        (function initHeroScroll() {
+            const hero = document.getElementById('hero');
+            if (!hero) return; // Guard clause
+
+            // 1. Elements to Animate (Source)
+            const heroLogo = document.getElementById('hero-logo');
+            const heroSleepless = document.getElementById('hero-word-sleepless');
+            const heroGrounds = document.getElementById('hero-word-grounds');
+            
+            // 2. Target Elements (Destination)
+            const headerLogo = document.getElementById('header-logo-target');
+            const headerTitleWrapper = document.querySelector('.fixed-header .header-title');
+            const headerSleepless = document.getElementById('header-word-sleepless');
+            const headerGrounds = document.getElementById('header-word-grounds');
+            
+            const fixedHeader = document.getElementById('fixed-header');
+            
+            // Set transform origin to top-left for easier scaling/positioning
+            gsap.set([heroLogo, heroSleepless, heroGrounds], { transformOrigin: "0% 0%" });
+
+            // Helper: Calculate Delta (Position & Scale)
+            // Returns a function for ScrollTrigger to re-calculate on resize
+            const getDelta = (source, target) => {
+                const sRect = source.getBoundingClientRect();
+                const tRect = target.getBoundingClientRect();
+                return {
+                    x: tRect.left - sRect.left,
+                    y: tRect.top - sRect.top,
+                    scale: tRect.width / sRect.width
+                };
+            };
+
+            const tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: hero,
+                    start: "top top",
+                    end: "bottom top", // Ends exactly when Hero leaves and Marquee hits top
+                    scrub: true,
+                    invalidateOnRefresh: true
+                }
             });
 
-            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+            // A. Fade Out Hero Background & Socials
+            tl.to('.hero-fade', { opacity: 0, duration: 0.5 }, 0);
+
+            // B. Fade In Fixed Header Background (Container)
+            tl.to(fixedHeader, { opacity: 1, duration: 0.1 }, 0);
+
+            // Helper: Scroll-compensated Y calculation
+            // Since we aren't pinning, the container scrolls UP.
+            // We must push the element DOWN by the same amount (+ delta) to hit the target.
+            const getScrollY = (source, target) => {
+                const delta = getDelta(source, target).y;
+                return delta + hero.offsetHeight;
+            };
+
+            // C. Morph Logo
+            tl.to(heroLogo, {
+                x: () => getDelta(heroLogo, headerLogo).x,
+                y: () => getScrollY(heroLogo, headerLogo),
+                scale: () => getDelta(heroLogo, headerLogo).scale,
+                ease: "none", // Linear scrub matches scroll best
+                duration: 1
+            }, 0);
+
+            // D. Morph Title Words
+            tl.to(heroSleepless, {
+                x: () => getDelta(heroSleepless, headerSleepless).x,
+                y: () => getScrollY(heroSleepless, headerSleepless),
+                scale: () => getDelta(heroSleepless, headerSleepless).scale,
+                ease: "none",
+                duration: 1
+            }, 0);
+
+            tl.to(heroGrounds, {
+                x: () => getDelta(heroGrounds, headerGrounds).x,
+                y: () => getScrollY(heroGrounds, headerGrounds),
+                scale: () => getDelta(heroGrounds, headerGrounds).scale,
+                ease: "none",
+                duration: 1
+            }, 0);
+
+            // E. Final Swap (Crossfade)
+            // Swap occurs when animation completes (hero bottom at top of screen)
+            tl.to([heroLogo, heroSleepless, heroGrounds], { autoAlpha: 0, duration: 0.05 }, 0.95);
+            tl.to([headerLogo, headerTitleWrapper], { autoAlpha: 1, duration: 0.05 }, 0.95);
+            
+            // Drop Hero Z at end just to be safe
+            tl.set(hero, { zIndex: 1 }, 0.95);
+            
         })();
+
+
+        // ---- GSAP: GENERIC FADE-IN FOR SECTIONS ----
+        document.querySelectorAll('.fade-in').forEach(el => {
+            gsap.to(el, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: el,
+                    start: 'top 85%',
+                    toggleActions: 'play none none none'
+                }
+            });
+        });
     </script>
 </body>
 
