@@ -909,6 +909,64 @@
             opacity: 0;
             transform: translateY(30px);
         }
+        /* =============================================
+           IMAGE MODAL (LIGHTBOX)
+           ============================================= */
+        .modal-overlay {
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.92);
+            cursor: pointer;
+            display: none; /* Hidden by default */
+        }
+
+        .modal-image-wrapper {
+            position: fixed;
+            z-index: 2001;
+            /* Centered by JS */
+            display: none; /* Hidden by default */
+        }
+
+        .modal-image-wrapper img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 30px rgba(255, 193, 7, 0.15);
+            cursor: default;
+        }
+
+        .close-modal {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-size: 3rem;
+            font-weight: 300;
+            line-height: 0.5;
+            cursor: pointer;
+            z-index: 2002;
+            display: none; /* Hidden by default */
+            transition: color 0.2s;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        .gallery-grid img {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .gallery-grid img:hover {
+            transform: scale(1.03);
+        }
     </style>
 </head>
 
@@ -1126,7 +1184,7 @@
 
             <div class="gallery-grid">
                 <div class="blueprint-placeholder">
-                    <span>[ IMG_SOURCE_PENDING ]</span>
+                    <img src="IMG_20260214_202629_819 (3)(1).jpg" alt="Gallery 1" style="width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <div class="blueprint-placeholder">
                     <span>[ IMG_SOURCE_PENDING ]</span>
@@ -1155,6 +1213,13 @@
         </div>
     </footer>
 
+
+    <!-- Image Lightbox -->
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="modal-wrapper" class="modal-image-wrapper">
+        <img id="modal-image" alt="Full screen view">
+    </div>
+    <span id="modal-close" class="close-modal">&times;</span>
 
     <!-- GSAP + ScrollTrigger -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -1304,6 +1369,136 @@
                 }
             });
         });
+
+        // ---- IMAGE MODAL (Lightbox with GSAP zoom) ----
+        (function initLightbox() {
+            const overlay = document.getElementById('modal-overlay');
+            const wrapper = document.getElementById('modal-wrapper');
+            const modalImg = document.getElementById('modal-image');
+            const closeBtn = document.getElementById('modal-close');
+            if (!overlay || !wrapper || !modalImg || !closeBtn) return;
+
+            let activeThumbnail = null;
+            let isAnimating = false;
+
+            // Calculate centered destination rect for the image
+            function getDestRect(imgW, imgH) {
+                const vw = window.innerWidth;
+                const vh = window.innerHeight;
+                const maxW = vw * 0.9;
+                const maxH = vh * 0.9;
+                const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+                const w = imgW * scale;
+                const h = imgH * scale;
+                return {
+                    width: w,
+                    height: h,
+                    left: (vw - w) / 2,
+                    top: (vh - h) / 2
+                };
+            }
+
+            // OPEN
+            function openModal(thumb) {
+                if (isAnimating) return;
+                isAnimating = true;
+                activeThumbnail = thumb;
+
+                const thumbRect = thumb.getBoundingClientRect();
+
+                // Show elements but keep them invisible for setup
+                overlay.style.display = 'block';
+                wrapper.style.display = 'block';
+                closeBtn.style.display = 'block';
+                modalImg.src = thumb.src;
+
+                const doAnimate = () => {
+                    // Natural image size
+                    const natW = modalImg.naturalWidth || thumbRect.width;
+                    const natH = modalImg.naturalHeight || thumbRect.height;
+                    const dest = getDestRect(natW, natH);
+
+                    // Position wrapper at thumbnail location
+                    gsap.set(wrapper, {
+                        left: thumbRect.left,
+                        top: thumbRect.top,
+                        width: thumbRect.width,
+                        height: thumbRect.height
+                    });
+
+                    // Animate overlay fade in
+                    gsap.fromTo(overlay, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' });
+
+                    // Animate close button
+                    gsap.fromTo(closeBtn, { opacity: 0 }, { opacity: 1, duration: 0.3, delay: 0.2 });
+
+                    // Animate wrapper from thumb rect to centered dest
+                    gsap.to(wrapper, {
+                        left: dest.left,
+                        top: dest.top,
+                        width: dest.width,
+                        height: dest.height,
+                        duration: 0.55,
+                        ease: 'power3.inOut',
+                        onComplete: () => {
+                            isAnimating = false;
+                            document.body.style.overflow = 'hidden';
+                        }
+                    });
+                };
+
+                if (modalImg.complete && modalImg.naturalWidth > 0) {
+                    doAnimate();
+                } else {
+                    modalImg.onload = () => {
+                        modalImg.onload = null;
+                        doAnimate();
+                    };
+                }
+            }
+
+            // CLOSE
+            function closeModal() {
+                if (isAnimating || !activeThumbnail) return;
+                isAnimating = true;
+
+                const thumbRect = activeThumbnail.getBoundingClientRect();
+
+                // Animate wrapper back to thumbnail
+                gsap.to(wrapper, {
+                    left: thumbRect.left,
+                    top: thumbRect.top,
+                    width: thumbRect.width,
+                    height: thumbRect.height,
+                    duration: 0.45,
+                    ease: 'power3.inOut',
+                    onComplete: () => {
+                        overlay.style.display = 'none';
+                        wrapper.style.display = 'none';
+                        closeBtn.style.display = 'none';
+                        document.body.style.overflow = '';
+                        activeThumbnail = null;
+                        isAnimating = false;
+                    }
+                });
+
+                // Fade out overlay and close button
+                gsap.to(overlay, { opacity: 0, duration: 0.4, ease: 'power2.in' });
+                gsap.to(closeBtn, { opacity: 0, duration: 0.2 });
+            }
+
+            // Attach click to all gallery images
+            document.querySelectorAll('.gallery-grid img').forEach(img => {
+                img.addEventListener('click', function() { openModal(this); });
+            });
+
+            // Close events
+            closeBtn.addEventListener('click', closeModal);
+            overlay.addEventListener('click', closeModal);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && wrapper.style.display === 'block') closeModal();
+            });
+        })();
     </script>
 </body>
 
