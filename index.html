@@ -961,6 +961,45 @@
             color: #fff;
         }
 
+        /* --- LIGHTBOX ARROWS --- */
+        .modal-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2002;
+            font-family: var(--font-display);
+            font-size: 4rem;
+            color: var(--accent);
+            cursor: pointer;
+            padding: 1rem;
+            user-select: none;
+            display: none; /* Hidden by default */
+            transition: color 0.2s ease, transform 0.2s ease;
+            line-height: 1;
+        }
+
+        .modal-arrow:hover {
+            color: #fff;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .modal-arrow-left {
+            left: 2rem;
+        }
+
+        .modal-arrow-right {
+            right: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .modal-arrow {
+                font-size: 3rem;
+                padding: 0.5rem;
+            }
+            .modal-arrow-left { left: 1rem; }
+            .modal-arrow-right { right: 1rem; }
+        }
+
         .gallery-grid img {
             cursor: pointer;
             transition: transform 0.2s ease;
@@ -1221,6 +1260,8 @@
         <img id="modal-image" alt="Full screen view">
     </div>
     <span id="modal-close" class="close-modal">&times;</span>
+    <div id="modal-prev" class="modal-arrow modal-arrow-left">&lt;</div>
+    <div id="modal-next" class="modal-arrow modal-arrow-right">&gt;</div>
 
     <!-- GSAP + ScrollTrigger -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -1438,10 +1479,15 @@
             const wrapper = document.getElementById('modal-wrapper');
             const modalImg = document.getElementById('modal-image');
             const closeBtn = document.getElementById('modal-close');
-            if (!overlay || !wrapper || !modalImg || !closeBtn) return;
+            const prevBtn = document.getElementById('modal-prev');
+            const nextBtn = document.getElementById('modal-next');
+
+            if (!overlay || !wrapper || !modalImg || !closeBtn || !prevBtn || !nextBtn) return;
 
             let activeThumbnail = null;
+            let currentIndex = -1;
             let isAnimating = false;
+            let galleryImages = [];
 
             // Calculate centered destination rect for the image
             function getDestRect(imgW, imgH) {
@@ -1460,11 +1506,18 @@
                 };
             }
 
+            function updateGalleryList() {
+                galleryImages = Array.from(document.querySelectorAll('.gallery-grid img'));
+            }
+
             // OPEN
             function openModal(thumb) {
                 if (isAnimating) return;
                 isAnimating = true;
+
+                updateGalleryList();
                 activeThumbnail = thumb;
+                currentIndex = galleryImages.indexOf(thumb);
 
                 const thumbRect = thumb.getBoundingClientRect();
 
@@ -1472,6 +1525,8 @@
                 overlay.style.display = 'block';
                 wrapper.style.display = 'block';
                 closeBtn.style.display = 'block';
+                prevBtn.style.display = 'block';
+                nextBtn.style.display = 'block';
                 modalImg.src = thumb.src;
 
                 const doAnimate = () => {
@@ -1491,8 +1546,8 @@
                     // Animate overlay fade in
                     gsap.fromTo(overlay, { opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' });
 
-                    // Animate close button
-                    gsap.fromTo(closeBtn, { opacity: 0 }, { opacity: 1, duration: 0.3, delay: 0.2 });
+                    // Animate close button & arrows
+                    gsap.fromTo([closeBtn, prevBtn, nextBtn], { opacity: 0 }, { opacity: 1, duration: 0.3, delay: 0.2 });
 
                     // Animate wrapper from thumb rect to centered dest
                     gsap.to(wrapper, {
@@ -1516,7 +1571,55 @@
                         modalImg.onload = null;
                         doAnimate();
                     };
+                    modalImg.onerror = () => {
+                        modalImg.onerror = null;
+                        doAnimate();
+                    };
                 }
+            }
+
+            // NAVIGATE (Next/Prev)
+            function showImage(index) {
+                if (isAnimating || index < 0 || index >= galleryImages.length) return;
+
+                currentIndex = index;
+                const newThumb = galleryImages[currentIndex];
+                activeThumbnail = newThumb; // Update active thumbnail for closing animation
+
+                // Simple crossfade: fade out current image content, swap src, resize, fade in
+                const tl = gsap.timeline();
+
+                tl.to(modalImg, { opacity: 0, duration: 0.2, onComplete: () => {
+                    modalImg.src = newThumb.src;
+
+                    modalImg.onload = () => {
+                        modalImg.onload = null;
+                        const dest = getDestRect(modalImg.naturalWidth, modalImg.naturalHeight);
+
+                        // Animate wrapper to new dimensions
+                        gsap.to(wrapper, {
+                            width: dest.width,
+                            height: dest.height,
+                            left: dest.left,
+                            top: dest.top,
+                            duration: 0.3,
+                            ease: 'power2.inOut'
+                        });
+
+                        // Fade image back in
+                        gsap.to(modalImg, { opacity: 1, duration: 0.2, delay: 0.1 });
+                    };
+                }});
+            }
+
+            function nextImage() {
+                const nextIndex = (currentIndex + 1) % galleryImages.length;
+                showImage(nextIndex);
+            }
+
+            function prevImage() {
+                const prevIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+                showImage(prevIndex);
             }
 
             // Expose globally
@@ -1541,15 +1644,16 @@
                         overlay.style.display = 'none';
                         wrapper.style.display = 'none';
                         closeBtn.style.display = 'none';
+                        prevBtn.style.display = 'none';
+                        nextBtn.style.display = 'none';
                         document.body.style.overflow = '';
                         activeThumbnail = null;
                         isAnimating = false;
                     }
                 });
 
-                // Fade out overlay and close button
-                gsap.to(overlay, { opacity: 0, duration: 0.4, ease: 'power2.in' });
-                gsap.to(closeBtn, { opacity: 0, duration: 0.2 });
+                // Fade out overlay and controls
+                gsap.to([overlay, closeBtn, prevBtn, nextBtn], { opacity: 0, duration: 0.4, ease: 'power2.in' });
             }
 
             // Attach click to all INITIAL gallery images (if any remain)
@@ -1557,11 +1661,18 @@
                 img.addEventListener('click', function() { openModal(this); });
             });
 
-            // Close events
+            // Event Listeners
             closeBtn.addEventListener('click', closeModal);
             overlay.addEventListener('click', closeModal);
+            prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+            nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
+
             document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && wrapper.style.display === 'block') closeModal();
+                if (wrapper.style.display === 'block') {
+                    if (e.key === 'Escape') closeModal();
+                    if (e.key === 'ArrowLeft') prevImage();
+                    if (e.key === 'ArrowRight') nextImage();
+                }
             });
         })();
     </script>
