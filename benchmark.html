@@ -988,7 +988,7 @@
                  alt="Sleepless Grounds Logo"
                  style="opacity: 0;">
             <span class="header-title" style="opacity: 0;">
-                <span id="header-word-sleepless">Sleepless</span> 
+                <span id="header-word-sleepless">Sleepless</span>
                 <span id="header-word-grounds">Grounds</span>
             </span>
         </div>
@@ -1005,18 +1005,18 @@
             <!-- Broken concrete opening via clip-path -->
             <div class="hero-broken-wall">
                 <div class="hero-broken-wall-bg hero-fade"></div>
-                
+
                 <div class="hero-broken-wall-inner">
                     <!-- The Flying Elements -->
                     <img class="hero-logo" id="hero-logo"
                          src="logo-cropped.png"
                          alt="Sleepless Grounds Logo">
-                    
+
                     <h1 class="hero-title">
                         <div class="hero-title-line"><span id="hero-word-sleepless">Sleepless</span></div>
                         <div class="hero-title-line"><span id="hero-word-grounds">Grounds</span></div>
                     </h1>
-                    
+
                     <div class="hero-fade-group hero-fade">
                         <p class="hero-subtitle">EST. 2026 // BUSTOS, BULACAN</p>
                         <div class="hero-social-links">
@@ -1246,41 +1246,20 @@
 
 
         // ---- DIRECTION TAB SWITCHING ----
-        (function() {
-            // Optimization: Cache DOM elements to avoid redundant traversals
-            const directionTabs = Array.from(document.querySelectorAll('.brutal-tab'));
-            const directionPanels = Array.from(document.querySelectorAll('.tab-panel')).map(p => ({
-                element: p,
-                video: p.querySelector('video'),
-                id: p.id
-            }));
+        window.switchDirectionTab = function(tabName) {
+            document.querySelectorAll('.brutal-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => {
+                p.classList.remove('active');
+                const video = p.querySelector('video');
+                if (video) video.pause();
+            });
 
-            window.switchDirectionTab = function(tabName) {
-                // Update tabs
-                directionTabs.forEach(t => {
-                    if (t.dataset.tab === tabName) {
-                        t.classList.add('active');
-                    } else {
-                        t.classList.remove('active');
-                    }
-                });
+            const activeTab = document.querySelector(`.brutal-tab[data-tab="${tabName}"]`);
+            if (activeTab) activeTab.classList.add('active');
 
-                // Update panels and manage videos
-                const targetPanelId = `panel-${tabName}`;
-                directionPanels.forEach(p => {
-                    // Always pause video if present, mimicking original behavior
-                    if (p.video) {
-                        p.video.pause();
-                    }
-
-                    if (p.id === targetPanelId) {
-                        p.element.classList.add('active');
-                    } else {
-                        p.element.classList.remove('active');
-                    }
-                });
-            };
-        })();
+            const activePanel = document.getElementById(`panel-${tabName}`);
+            if (activePanel) activePanel.classList.add('active');
+        };
 
 
         // ---- GSAP: HERO TO STICKY HEADER TRANSFORMATION ----
@@ -1292,15 +1271,15 @@
             const heroLogo = document.getElementById('hero-logo');
             const heroSleepless = document.getElementById('hero-word-sleepless');
             const heroGrounds = document.getElementById('hero-word-grounds');
-            
+
             // 2. Target Elements (Destination)
             const headerLogo = document.getElementById('header-logo-target');
             const headerTitleWrapper = document.querySelector('.fixed-header .header-title');
             const headerSleepless = document.getElementById('header-word-sleepless');
             const headerGrounds = document.getElementById('header-word-grounds');
-            
+
             const fixedHeader = document.getElementById('fixed-header');
-            
+
             // Set transform origin to top-left for easier scaling/positioning
             gsap.set([heroLogo, heroSleepless, heroGrounds], { transformOrigin: "0% 0%" });
 
@@ -1370,10 +1349,10 @@
             // Swap occurs when animation completes (hero bottom at top of screen)
             tl.to([heroLogo, heroSleepless, heroGrounds], { autoAlpha: 0, duration: 0.05 }, 0.95);
             tl.to([headerLogo, headerTitleWrapper], { autoAlpha: 1, duration: 0.05 }, 0.95);
-            
+
             // Drop Hero Z at end just to be safe
             tl.set(hero, { zIndex: 1 }, 0.95);
-            
+
         })();
 
 
