@@ -1009,7 +1009,61 @@
             transform: scale(1.03);
         }
     </style>
-</head>
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+            "@type": "CafeOrCoffeeShop",
+            "@id": "https://www.sleeplessgrounds.coffee",
+            "name": "Sleepless Grounds",
+            "url": "https://www.sleeplessgrounds.coffee",
+            "image": "https://www.sleeplessgrounds.coffee/logo-cropped.png",
+            "priceRange": "$$",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "San Pedro",
+                "addressLocality": "Bustos",
+                "addressRegion": "Bulacan",
+                "postalCode": "3007",
+                "addressCountry": "PH"
+            },
+            "openingHoursSpecification": [
+                {
+                    "@type": "OpeningHoursSpecification",
+                    "dayOfWeek": [
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday",
+                        "Sunday"
+                    ],
+                    "opens": "14:00",
+                    "closes": "02:00"
+                }
+            ],
+            "sameAs": [
+                "https://www.facebook.com/share/1LySeapZ63/?mibextid=wwXIfr",
+                "https://www.instagram.com/sleeplessgrounds?igsh=MTYwc3pkbXIyZjVzMA%3D%3D&utm_source=qr"
+            ]
+        },
+        {
+            "@type": "WebSite",
+            "@id": "https://www.sleeplessgrounds.coffee/#website",
+            "url": "https://www.sleeplessgrounds.coffee",
+            "name": "Sleepless Grounds",
+            "publisher": {
+                "@id": "https://www.sleeplessgrounds.coffee"
+            }
+        }
+    ]
+}
+    </script>
+    </head>
 
 <body>
     <!-- Google Tag Manager (noscript) -->
