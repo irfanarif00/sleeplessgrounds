@@ -115,6 +115,130 @@
             z-index: 1002; /* Stack above fixed header for animation */
         }
 
+        
+        /* =============================================
+           HAMBURGER MENU & NAVIGATION
+        ============================================= */
+        .hamburger-menu {
+            position: fixed;
+            top: 0.75rem;
+            left: 2rem;
+            cursor: pointer;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px;
+        }
+
+        .hamburger-line {
+            width: 30px;
+            height: 2px;
+            background-color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 480px) {
+            .hamburger-menu {
+                left: 1rem;
+            }
+        }
+
+        /* Hamburger active state */
+        .hamburger-menu.active .line-1 { transform: translateY(8px) rotate(45deg); background-color: var(--accent); }
+        .hamburger-menu.active .line-2 { opacity: 0; }
+        .hamburger-menu.active .line-3 { transform: translateY(-8px) rotate(-45deg); background-color: var(--accent); }
+
+        /* Nav menu container */
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-primary);
+            z-index: 1500;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden; /* handled by GSAP autoAlpha */
+            /* Subtly textured like the rest of the site */
+            background-image:
+                linear-gradient(rgba(255, 193, 7, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 193, 7, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 4rem);
+            color: var(--text-primary);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            position: relative;
+            display: inline-block;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+        }
+
+        /* Number prefix */
+        .nav-link::before {
+            content: attr(data-num);
+            position: absolute;
+            left: -5.5rem;
+            top: 0.5rem;
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            color: var(--accent);
+            opacity: 0;
+            transform: translateX(10px);
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover::before {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .nav-socials {
+            position: absolute;
+            bottom: 3rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-social-link {
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav-social-link:hover {
+            color: var(--accent);
+        }
+
         /* Concrete texture overlay */
         .hero::before {
             content: '';
@@ -1082,6 +1206,13 @@
     <!-- End Google Tag Manager (noscript) -->
 
 
+    <!-- Hamburger Menu Button (standalone fixed element) -->
+    <div class="hamburger-menu" id="hamburger-btn">
+        <div class="hamburger-line line-1"></div>
+        <div class="hamburger-line line-2"></div>
+        <div class="hamburger-line line-3"></div>
+    </div>
+
     <!-- Fixed header bar — always at top, fades in on scroll -->
     <div class="fixed-header" id="fixed-header">
         <div class="fixed-header-inner">
@@ -1098,6 +1229,23 @@
         </div>
     </div>
 
+
+    <!-- Fullscreen Navigation Menu -->
+    <div class="nav-overlay" id="nav-overlay">
+        <ul class="nav-links">
+            <li><a href="#hero" class="nav-link" data-num="// 01">Home</a></li>
+            <li><a href="#about" class="nav-link" data-num="// 02">Hours & Info</a></li>
+            <li><a href="#menu" class="nav-link" data-num="// 03">Menu</a></li>
+            <li><a href="#directions" class="nav-link" data-num="// 04">Directions</a></li>
+            <li><a href="#gallery" class="nav-link" data-num="// 05">Gallery</a></li>
+            <li><a href="#subscribe" class="nav-link" data-num="// 06">Signal</a></li>
+        </ul>
+        <div class="nav-socials">
+            <a href="https://www.instagram.com/sleeplessgrounds?igsh=MTYwc3pkbXIyZjVzMA%3D%3D&utm_source=qr" class="nav-social-link" target="_blank">INSTAGRAM</a>
+            <a href="https://www.facebook.com/share/1LySeapZ63/?mibextid=wwXIfr" class="nav-social-link" target="_blank">FACEBOOK</a>
+            <a href="https://maps.app.goo.gl/RPZ6Ko1cc4BzerpH7" class="nav-social-link" target="_blank">GOOGLE MAPS</a>
+        </div>
+    </div>
 
     <!-- =============================================
          A. HERO — "BROKEN WALL" SECTION
@@ -2241,6 +2389,76 @@
             });
         })();
     </script>
+
+    <script>
+        // ---- NAVIGATION MENU (Hamburger) ----
+        (function initNav() {
+            const btn = document.getElementById('hamburger-btn');
+            const overlay = document.getElementById('nav-overlay');
+            const links = document.querySelectorAll('.nav-link');
+            
+            let isNavOpen = false;
+            
+            // Timeline for smooth open/close animation
+            const tl = gsap.timeline({ paused: true, reversed: true });
+            
+            tl.to(overlay, { 
+                autoAlpha: 1, // handles visibility and opacity
+                duration: 0.4, 
+                ease: 'power3.inOut' 
+            })
+            .from('.nav-link', {
+                y: 30,
+                opacity: 0,
+                duration: 0.4,
+                stagger: 0.05,
+                ease: 'power2.out'
+            }, "-=0.2")
+            .from('.nav-social-link', {
+                y: 20,
+                opacity: 0,
+                duration: 0.3,
+                stagger: 0.05,
+                ease: 'power2.out'
+            }, "-=0.3");
+
+            function toggleNav() {
+                isNavOpen = !isNavOpen;
+                btn.classList.toggle('active');
+                
+                if (isNavOpen) {
+                    document.body.style.overflow = 'hidden'; // stop background scrolling
+                    tl.play();
+                } else {
+                    document.body.style.overflow = '';
+                    tl.reverse();
+                }
+            }
+
+            btn.addEventListener('click', toggleNav);
+
+            // Close nav when clicking a link
+            links.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetId = link.getAttribute('href');
+                    if (targetId.startsWith('#')) {
+                        const targetEl = document.querySelector(targetId);
+                        
+                        if (targetEl) {
+                            e.preventDefault();
+                            toggleNav();
+                            
+                            // Wait for animation to reverse before jumping
+                            setTimeout(() => {
+                                targetEl.scrollIntoView({ behavior: 'smooth' });
+                            }, 500); 
+                        }
+                    }
+                });
+            });
+        })();
+    </script>
+
 </body>
 
 </html>
