@@ -628,38 +628,29 @@
         }
 
         .gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         .blueprint-placeholder {
             position: relative;
             background: var(--bg-elevated);
-            border: var(--border-accent);
-            aspect-ratio: 4 / 3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: block;
             overflow: hidden;
-            /* Diagonal X lines — architectural wireframe */
-            background-image:
-                linear-gradient(
-                    to bottom right,
-                    transparent calc(50% - 0.5px),
-                    rgba(255, 193, 7, 0.15) calc(50% - 0.5px),
-                    rgba(255, 193, 7, 0.15) calc(50% + 0.5px),
-                    transparent calc(50% + 0.5px)
-                ),
-                linear-gradient(
-                    to top right,
-                    transparent calc(50% - 0.5px),
-                    rgba(255, 193, 7, 0.15) calc(50% - 0.5px),
-                    rgba(255, 193, 7, 0.15) calc(50% + 0.5px),
-                    transparent calc(50% + 0.5px)
-                );
-            background-color: var(--bg-elevated);
+            height: 350px; /* Fixed height forces them to equal row heights */
+            flex-grow: 1;
+            border: none;
         }
+
+        /* Pseudo-random flex-basis to create the varied-width "mosaic" effect */
+        .blueprint-placeholder:nth-child(7n+1) { flex-basis: 400px; }
+        .blueprint-placeholder:nth-child(7n+2) { flex-basis: 200px; }
+        .blueprint-placeholder:nth-child(7n+3) { flex-basis: 250px; }
+        .blueprint-placeholder:nth-child(7n+4) { flex-basis: 200px; }
+        .blueprint-placeholder:nth-child(7n+5) { flex-basis: 350px; }
+        .blueprint-placeholder:nth-child(7n+6) { flex-basis: 300px; }
+        .blueprint-placeholder:nth-child(7n+7) { flex-basis: 450px; }
 
         .blueprint-placeholder span {
             font-family: var(--font-mono);
@@ -880,8 +871,8 @@
                 border-bottom: none;
             }
 
-            .gallery-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .blueprint-placeholder {
+                height: 280px;
             }
         }
 
@@ -916,8 +907,9 @@
                 pointer-events: none;
             }
 
-            .gallery-grid {
-                grid-template-columns: 1fr;
+            .blueprint-placeholder {
+                height: 220px;
+                flex-basis: 100% !important; /* Force vertical stack on tiny mobile screens */
             }
 
             .site-footer {
@@ -1047,10 +1039,6 @@
         }
         .gallery-grid img {
             cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        .gallery-grid img:hover {
-            transform: scale(1.03);
         }
     </style>
 
@@ -2029,6 +2017,17 @@
             // Clear existing placeholders
             galleryGrid.innerHTML = '';
 
+            // Helper to capture actual image size for lightGallery's zoom-from-thumbnail animation
+            const setLgSize = (img, a) => {
+                if (img.complete && img.naturalWidth > 0) {
+                    a.setAttribute('data-lg-size', `${img.naturalWidth}-${img.naturalHeight}`);
+                } else {
+                    img.addEventListener('load', () => {
+                        a.setAttribute('data-lg-size', `${img.naturalWidth}-${img.naturalHeight}`);
+                    });
+                }
+            };
+
             try {
                 // 1. Fetch from Instagram (up to 6 posts max)
                 const response = await fetch('https://feeds.behold.so/8uxeDETTCRl37Va5Oizd');
@@ -2058,10 +2057,9 @@
                         img.style.width = '100%';
                         img.style.height = '100%';
                         img.style.objectFit = 'cover';
-                        img.style.transition = 'transform 0.2s ease';
 
-                        img.onmouseenter = () => img.style.transform = 'scale(1.03)';
-                        img.onmouseleave = () => img.style.transform = 'scale(1)';
+                        // Set sizes for lightGallery zoom effect
+                        setLgSize(img, a);
 
                         a.appendChild(img);
                         galleryGrid.appendChild(a);
@@ -2088,10 +2086,9 @@
                 img.style.width = '100%';
                 img.style.height = '100%';
                 img.style.objectFit = 'cover';
-                img.style.transition = 'transform 0.2s ease';
 
-                img.onmouseenter = () => img.style.transform = 'scale(1.03)';
-                img.onmouseleave = () => img.style.transform = 'scale(1)';
+                // Set sizes for lightGallery zoom effect
+                setLgSize(img, a);
 
                 a.appendChild(img);
                 galleryGrid.appendChild(a);
@@ -2104,6 +2101,7 @@
                     speed: 500,
                     download: false,
                     counter: false,
+                    zoomFromOrigin: true, // Enables the zoom-from-thumbnail animation
                     selector: 'a'
                 });
             }
