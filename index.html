@@ -907,10 +907,22 @@
                 pointer-events: none;
             }
 
-            .blueprint-placeholder {
-                height: 220px;
-                flex-basis: 100% !important; /* Force vertical stack on tiny mobile screens */
+            .gallery-grid {
+                gap: 8px; /* Tighter layout on mobile */
             }
+
+            .blueprint-placeholder {
+                height: 140px;
+            }
+
+            /* Scale down mobile flex-basis so items don't force single-row wraps */
+            .blueprint-placeholder:nth-child(7n+1) { flex-basis: 180px; }
+            .blueprint-placeholder:nth-child(7n+2) { flex-basis: 100px; }
+            .blueprint-placeholder:nth-child(7n+3) { flex-basis: 120px; }
+            .blueprint-placeholder:nth-child(7n+4) { flex-basis: 90px; }
+            .blueprint-placeholder:nth-child(7n+5) { flex-basis: 150px; }
+            .blueprint-placeholder:nth-child(7n+6) { flex-basis: 130px; }
+            .blueprint-placeholder:nth-child(7n+7) { flex-basis: 200px; }
 
             .site-footer {
                 grid-template-columns: 1fr;
