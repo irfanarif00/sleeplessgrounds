@@ -558,61 +558,274 @@
             background: var(--grid-line);
         }
 
-        /* File-system tab header for the menu container */
-        .file-tab {
-            display: inline-flex;
+        /* Terminal receipt window */
+        .menu-terminal {
+            position: relative;
+            border: var(--border-accent);
+            background: var(--bg-surface);
+            max-width: 640px;
+            margin: 0 auto;
+            transform-origin: top center;
+        }
+
+        .menu-titlebar {
+            display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.6rem 1.2rem;
+            padding: 0.6rem 1rem;
             background: var(--bg-elevated);
-            border: var(--border-accent);
-            border-bottom: none;
+            border-bottom: 1px solid var(--grid-line);
+        }
+
+        .menu-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--grid-line);
+        }
+
+        .menu-dot.on {
+            background: var(--accent);
+        }
+
+        .menu-mode {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            color: var(--accent);
+        }
+
+        .menu-mode svg {
+            display: block;
+        }
+
+        /* Ambient rising-steam loop shared by the food (plate) and drinks (cup) icons */
+        .menu-mode .steam {
+            opacity: 0;
+            animation: menu-steam-rise 2.2s ease-in-out infinite;
+        }
+        .menu-mode .steam:nth-child(1) { animation-delay: 0s; }
+        .menu-mode .steam:nth-child(2) { animation-delay: 0.55s; }
+        .menu-mode .steam:nth-child(3) { animation-delay: 1.1s; }
+        @keyframes menu-steam-rise {
+            0% { opacity: 0; transform: translateY(0); }
+            35% { opacity: 0.9; }
+            100% { opacity: 0; transform: translateY(-5px); }
+        }
+
+        .menu-fname {
+            margin-left: 0.7rem;
+            color: var(--text-secondary);
+            font-size: 0.68rem;
+            letter-spacing: 0.05em;
+        }
+
+        .menu-body {
+            padding: 2rem clamp(1rem, 4vw, 2.4rem);
             font-family: var(--font-mono);
+        }
+
+        .menu-shop {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .menu-shop-name {
+            font-family: var(--font-display);
+            letter-spacing: 0.2em;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .menu-shop-tag {
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-top: 0.2rem;
+        }
+
+        /* Printed category selector (food / drinks) */
+        .menu-select {
+            text-align: center;
+            margin-bottom: 1.6rem;
+            font-size: 0.78rem;
+        }
+
+        .menu-select-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 0.6rem;
+        }
+
+        .menu-opt {
+            appearance: none;
+            -webkit-appearance: none;
+            margin: 0;
+            line-height: normal;
+            cursor: pointer;
+            color: var(--text-secondary);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 0.35rem 0.9rem;
+            border: 1px solid var(--grid-line);
+            border-radius: 0;
+            background: transparent;
+            font-family: var(--font-mono);
+            font-size: inherit;
+            transition: color 0.15s ease, background 0.15s ease;
+        }
+        .menu-opt:first-child { border-right: none; }
+        .menu-opt:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .menu-opt.active {
+            color: var(--bg-primary);
+            background: var(--accent);
+            border-color: var(--accent);
+            font-weight: 700;
+            box-shadow: 0 0 10px 1px rgba(255, 193, 7, 0.55), 0 0 22px 4px rgba(255, 193, 7, 0.25);
+        }
+
+        .menu-panel { display: none; }
+        .menu-panel.active { display: block; }
+
+        .menu-rule {
+            border-top: 1px dashed var(--grid-line);
+            margin: 1.1rem 0;
+        }
+
+        .menu-cat-title {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-bottom: 0.2rem;
+        }
+
+        .menu-cat-note {
+            color: var(--text-secondary);
+            text-align: center;
+            font-size: 0.65rem;
+            font-style: italic;
+            margin-bottom: 0.9rem;
+        }
+
+        .menu-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.4rem;
+            font-size: 0.85rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .menu-item-name {
+            white-space: nowrap;
+            text-transform: lowercase;
+            color: var(--text-primary);
+        }
+
+        .menu-fill {
+            flex: 1;
+            border-bottom: 1px dotted var(--grid-line);
+            height: 0.6em;
+            margin: 0 0.3rem;
+        }
+
+        .menu-price {
+            font-variant-numeric: tabular-nums;
+            color: var(--accent);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .menu-item-desc {
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            margin: 0 0 0.7rem 1.1rem;
+        }
+        .menu-item-desc::before {
+            content: "> ";
+            color: var(--grid-line);
+        }
+
+        .menu-item-foot {
+            color: var(--text-secondary);
+            font-size: 0.65rem;
+            margin: -0.4rem 0 0.7rem 1.1rem;
+        }
+
+        .menu-tag {
+            color: var(--accent);
+        }
+
+        .menu-icon-spice {
+            color: var(--accent);
+            vertical-align: -1px;
+        }
+
+        .menu-cut {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            margin: 1.5rem 0;
+            letter-spacing: 0.05em;
+        }
+
+        .menu-cursor {
+            display: inline-block;
+            width: 7px;
+            height: 1em;
+            background: var(--accent);
+            vertical-align: text-bottom;
+            animation: menu-cursor-blink 1s steps(1) infinite;
+        }
+        @keyframes menu-cursor-blink { 50% { opacity: 0; } }
+
+        .menu-total {
+            text-align: center;
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+
+        /* Drinks-only spec block: add-ons + roast guide */
+        .menu-spec {
+            border: 1px dashed var(--grid-line);
+            padding: 1rem 1.1rem;
+            margin: 0 0 1.8rem;
             font-size: 0.75rem;
+        }
+
+        .menu-spec-title {
             color: var(--accent);
             text-transform: uppercase;
             letter-spacing: 0.1em;
+            font-size: 0.7rem;
+            margin-bottom: 0.6rem;
         }
 
-        .file-tab-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: var(--accent);
-            animation: blink 2s ease-in-out infinite;
+        .menu-spec-row {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            margin-bottom: 0.2rem;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        .menu-roast-line {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.3rem 1rem;
+            margin-top: 0.5rem;
         }
 
-        .menu-images-container {
-            border: var(--border-accent);
-            background: var(--bg-elevated);
-            overflow: hidden;
-            position: relative;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0;
-        }
-
-        @media (min-width: 1025px) {
-            .menu-images-container {
-                grid-template-columns: 1fr 1fr;
-            }
-            .menu-images-container img:first-child {
-                border-right: var(--border-accent);
-            }
-        }
-
-        .menu-images-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-            /* Invert white menu images to dark mode */
-            filter: invert(1) hue-rotate(180deg);
-        }
+        .menu-roast-dots { color: var(--accent); letter-spacing: 2px; }
+        .menu-roast-notes { color: var(--text-secondary); font-size: 0.65rem; }
 
 
         /* =============================================
@@ -1092,7 +1305,7 @@
             ],
             "sameAs": [
                 "https://www.facebook.com/share/1LySeapZ63/?mibextid=wwXIfr",
-                "https://www.instagram.com/sleeplessgrounds?igsh=MTYwc3pkbXIyZjVzMA%3D%3D&utm_source=qr"
+                "https://www.instagram.com/sleeplessgrounds.cafe/"
             ]
         },
         {
@@ -1154,7 +1367,7 @@
             <li><a href="#subscribe" class="nav-link" data-num="// 06">Signal</a></li>
         </ul>
         <div class="nav-socials">
-            <a href="https://www.instagram.com/sleeplessgrounds?igsh=MTYwc3pkbXIyZjVzMA%3D%3D&utm_source=qr" class="nav-social-link" target="_blank">INSTAGRAM</a>
+            <a href="https://www.instagram.com/sleeplessgrounds.cafe/" class="nav-social-link" target="_blank">INSTAGRAM</a>
             <a href="https://www.facebook.com/share/1LySeapZ63/?mibextid=wwXIfr" class="nav-social-link" target="_blank">FACEBOOK</a>
             <a href="https://maps.app.goo.gl/RPZ6Ko1cc4BzerpH7" class="nav-social-link" target="_blank">GOOGLE MAPS</a>
         </div>
@@ -1186,7 +1399,7 @@
                         <p class="hero-subtitle">EST. 2026 // BUSTOS, BULACAN</p>
                         <div class="hero-social-links">
                             <a href="https://www.facebook.com/share/1LySeapZ63/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">Facebook</a>
-                            <a href="https://www.instagram.com/sleeplessgrounds?igsh=MTYwc3pkbXIyZjVzMA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram</a>
+                            <a href="https://www.instagram.com/sleeplessgrounds.cafe/" target="_blank" rel="noopener noreferrer">Instagram</a>
                             <a href="https://maps.app.goo.gl/RPZ6Ko1cc4BzerpH7" target="_blank" rel="noopener noreferrer">Google Maps</a>
                         </div>
                     </div>
@@ -1255,32 +1468,215 @@
 
 
     <!-- =============================================
-         D. MENU — Image Gallery
-         Menu images with inversion filter to blend
-         into the dark brutalist UI.
+         D. MENU — Terminal Receipt
+         Food/drinks menu rendered as a POS printout
+         inside a terminal window. See MENU_DATA in
+         the script below for the single source of
+         truth for items/prices (cross-checked against
+         SG Menu 202605.pdf).
     ============================================= -->
     <section id="menu">
-        <div class="menu-section fade-in">
+        <div class="menu-section">
             <!-- Section header -->
             <div class="section-header">
                 <span class="section-header-label">// 02 — Menu</span>
                 <div class="section-header-line"></div>
             </div>
 
-            <!-- File-system tab styling -->
-            <div class="file-tab">
-                <span class="file-tab-dot"></span>
-                FILE: SG_MENU_202602.PNG
-            </div>
+            <div class="menu-terminal" id="menu-terminal">
+                <div class="menu-titlebar">
+                    <span class="menu-dot on"></span><span class="menu-dot"></span><span class="menu-dot"></span>
+                    <div class="menu-mode" id="menu-mode-icon" aria-hidden="true"></div>
+                    <span class="menu-fname">sg_menu_202605.pdf</span>
+                </div>
+                <div class="menu-body">
+                    <div class="menu-shop">
+                        <div class="menu-shop-name">Sleepless Grounds</div>
+                        <div class="menu-shop-tag">coffee · kitchen · art</div>
+                    </div>
 
-            <!-- Menu images with inversion filter -->
-            <div class="menu-images-container">
-                <img src="menu-images/menu-page-0.png"
-                     alt="Sleepless Grounds Menu — Page 1"
-                     loading="lazy">
-                <img src="menu-images/menu-page-1.png"
-                     alt="Sleepless Grounds Menu — Page 2"
-                     loading="lazy">
+                    <div class="menu-select">
+                        <span class="menu-select-label">select category</span>
+                        <button type="button" class="menu-opt active" data-target="menu-food">food</button><button type="button" class="menu-opt" data-target="menu-drinks">drinks</button>
+                    </div>
+
+                    <div class="menu-panels">
+                        <!-- FOOD -->
+                        <div id="menu-food" class="menu-panel active">
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">starters</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">fries</span><span class="menu-fill"></span><span class="menu-price">₱160</span></div>
+                            <div class="menu-item-desc anim-line">straight cut fries, dip*</div>
+                            <div class="menu-item-foot anim-line">*ketchup, honey butter, garlic mayo</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">enoki</span><span class="menu-fill"></span><span class="menu-price">₱180</span></div>
+                            <div class="menu-item-desc anim-line">enoki mushrooms, sriracha mayo</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">chicken poppers <span class="menu-tag">[NEW]</span></span><span class="menu-fill"></span><span class="menu-price">₱210</span></div>
+                            <div class="menu-item-desc anim-line">mango habanero or garlic parmesan</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">chicken fajitas</span><span class="menu-fill"></span><span class="menu-price">₱220</span></div>
+                            <div class="menu-item-desc anim-line">pita wrap, chicken breast, bell peppers, white onions, mozzarella, garlic yogurt dip</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">philly cheesesteak <span class="menu-tag">[NEW]</span></span><span class="menu-fill"></span><span class="menu-price">₱250</span></div>
+                            <div class="menu-item-desc anim-line">pita wrap, ground beef, caramelized onion, tomatoes, sharp cheddar, bbq dip</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">kaya toast <span class="menu-tag">[NEW]</span></span><span class="menu-fill"></span><span class="menu-price">₱270</span></div>
+                            <div class="menu-item-desc anim-line">brioche french toast, kaya jam, omelette, bacon</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">nachos</span><span class="menu-fill"></span><span class="menu-price">₱280</span></div>
+                            <div class="menu-item-desc anim-line">ground beef, nachos, onions, tomatoes, jalapeños, cheese sauce</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">grilled ham &amp; cheese</span><span class="menu-fill"></span><span class="menu-price">₱290</span></div>
+                            <div class="menu-item-desc anim-line">ham, mozzarella, cheddar, jalapeños, sourdough bread, tomato dip</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">salad** <span class="menu-tag">[NEW]</span></span><span class="menu-fill"></span><span class="menu-price">₱320</span></div>
+                            <div class="menu-item-desc anim-line">carrot, corn, cucumber, lettuce, peaches, chicken or tuna, roasted sesame dressing</div>
+                            <div class="menu-item-foot anim-line">**friday to sunday only</div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">pasta</div>
+                            <div class="menu-cat-note anim-line">served with toasted garlic pandesal</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">blanca</span><span class="menu-fill"></span><span class="menu-price">₱250</span></div>
+                            <div class="menu-item-desc anim-line">linguine, bacon, mushroom, cream, parmesan, sous vide egg, fried onions</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">gochujang <svg class="menu-icon-spice" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c-2.8 3.6-5 6.4-5 10a5 5 0 0 0 10 0c0-1.6-.7-2.6-1.6-3.4.2 1.6-.8 2.4-1.6 1.6.8-1.6-.4-3.2-1.8-4.2z"/></svg></span><span class="menu-fill"></span><span class="menu-price">₱260</span></div>
+                            <div class="menu-item-desc anim-line">linguine, hungarian sausage, garlic sausage, gochujang, peanut, seaweed flakes</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">lasagna</span><span class="menu-fill"></span><span class="menu-price">₱280</span></div>
+                            <div class="menu-item-desc anim-line">lasagna sheets, italian sauce, ground beef, bechamel, mozzarella, cheddar</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">pesto <span class="menu-tag">[NEW]</span></span><span class="menu-fill"></span><span class="menu-price">₱350</span></div>
+                            <div class="menu-item-desc anim-line">spaghetti, pesto, basil, cashews, chicken kiev, parmesan</div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">mains</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">kimchi fried rice</span><span class="menu-fill"></span><span class="menu-price">₱230</span></div>
+                            <div class="menu-item-desc anim-line">bacon, kimchi, white rice, mozzarella, fried egg, seaweed flakes</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">breaded chicken curry</span><span class="menu-fill"></span><span class="menu-price">₱260</span></div>
+                            <div class="menu-item-desc anim-line">chicken, white rice, veggies, filipino-style curry</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">crispy liempo</span><span class="menu-fill"></span><span class="menu-price">₱280</span></div>
+                            <div class="menu-item-desc anim-line">pork liempo, fried rice, fried egg, atsara, homemade lechon sarsa</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">bangus bataa-yaki <span class="menu-tag">[NEW]</span></span><span class="menu-fill"></span><span class="menu-price">₱300</span></div>
+                            <div class="menu-item-desc anim-line">bangus belly, white rice, ajitsuke tamago, enoki</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">tapa ni momi <span class="menu-tag">[NEW]</span></span><span class="menu-fill"></span><span class="menu-price">₱300</span></div>
+                            <div class="menu-item-desc anim-line">beef sirloin, fried rice, fried egg, spiced vinegar</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">nasi lemak</span><span class="menu-fill"></span><span class="menu-price">₱300</span></div>
+                            <div class="menu-item-desc anim-line">homemade fried chicken, coconut rice, sambal, fried egg, ikan bilis, roasted peanuts, cucumber</div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cut anim-line">✂ — — — — — — — — — — — — — — — — — —</div>
+                            <div class="menu-total anim-line">19 items on file<span class="menu-cursor"></span></div>
+                        </div>
+
+                        <!-- DRINKS -->
+                        <div id="menu-drinks" class="menu-panel">
+                            <div class="menu-spec anim-line">
+                                <div class="menu-spec-title">// add ons</div>
+                                <div class="menu-spec-row"><span>cream</span><span>₱25</span></div>
+                                <div class="menu-spec-row"><span>syrups</span><span>₱30</span></div>
+                                <div class="menu-spec-row"><span>oatside</span><span>₱40</span></div>
+                                <div class="menu-spec-row"><span>shot</span><span>₱40</span></div>
+                                <div class="menu-spec-title" style="margin-top:0.8rem;">// choose your roast</div>
+                                <div class="menu-roast-line">
+                                    <span>medium <span class="menu-roast-dots">●●○</span></span>
+                                    <span class="menu-roast-notes">balanced / smooth / nutty · caffeine: moderate</span>
+                                </div>
+                                <div class="menu-roast-line">
+                                    <span>dark <span class="menu-roast-dots">●●●</span></span>
+                                    <span class="menu-roast-notes">bold / smoky / intense · caffeine: lower</span>
+                                </div>
+                            </div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">classics</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">long black</span><span class="menu-fill"></span><span class="menu-price">₱130</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">caffe latte</span><span class="menu-fill"></span><span class="menu-price">₱140</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">spanish latte</span><span class="menu-fill"></span><span class="menu-price">₱170</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">mocha <span class="menu-tag">[ICED]</span></span><span class="menu-fill"></span><span class="menu-price">₱180</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">caramel macchiato</span><span class="menu-fill"></span><span class="menu-price">₱190</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">vanilla breve latte</span><span class="menu-fill"></span><span class="menu-price">₱190</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">white chocolate</span><span class="menu-fill"></span><span class="menu-price">₱210</span></div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">sg specials</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">burnt orange americano <span class="menu-tag">[ICED]</span></span><span class="menu-fill"></span><span class="menu-price">₱180</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">cinnamon latte</span><span class="menu-fill"></span><span class="menu-price">₱185</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">sea salt latte <span class="menu-tag">[ICED]</span></span><span class="menu-fill"></span><span class="menu-price">₱185</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">tres leches</span><span class="menu-fill"></span><span class="menu-price">₱190</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">gula melaka coco latte</span><span class="menu-fill"></span><span class="menu-price">₱210</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">coco caramel latte</span><span class="menu-fill"></span><span class="menu-price">₱210</span></div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">matcha</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">matcha latte</span><span class="menu-fill"></span><span class="menu-price">₱170</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">coco matcha latte</span><span class="menu-fill"></span><span class="menu-price">₱180</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">strawberry matcha</span><span class="menu-fill"></span><span class="menu-price">₱180</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">hazelnut matcha</span><span class="menu-fill"></span><span class="menu-price">₱180</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">dirty matcha</span><span class="menu-fill"></span><span class="menu-price">₱185</span></div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">ube <span class="menu-tag">[NEW]</span></div>
+                            <div class="menu-cat-note anim-line">iced only</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">ube latte</span><span class="menu-fill"></span><span class="menu-price">₱200</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">ube matcha</span><span class="menu-fill"></span><span class="menu-price">₱210</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">ube coco latte</span><span class="menu-fill"></span><span class="menu-price">₱220</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">ube gula melaka</span><span class="menu-fill"></span><span class="menu-price">₱240</span></div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">non-coffee</div>
+                            <div class="menu-cat-note anim-line">iced only</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">strawberry milk</span><span class="menu-fill"></span><span class="menu-price">₱140</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">mixed berries milk</span><span class="menu-fill"></span><span class="menu-price">₱140</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">blueberry sea salt</span><span class="menu-fill"></span><span class="menu-price">₱165</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">strawberry sea salt</span><span class="menu-fill"></span><span class="menu-price">₱165</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">chocoberry</span><span class="menu-fill"></span><span class="menu-price">₱170</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">classic choco hazelnut</span><span class="menu-fill"></span><span class="menu-price">₱185</span></div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">frappe</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">matcha</span><span class="menu-fill"></span><span class="menu-price">₱210</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">strawberry</span><span class="menu-fill"></span><span class="menu-price">₱220</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">salted caramel</span><span class="menu-fill"></span><span class="menu-price">₱220</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">cookies &amp; cream <span class="menu-tag">[NEW]</span></span><span class="menu-fill"></span><span class="menu-price">₱240</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">java chip</span><span class="menu-fill"></span><span class="menu-price">₱240</span></div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">refreshments <span class="menu-tag">[NEW]</span></div>
+                            <div class="menu-cat-note anim-line">iced only</div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">lime</span><span class="menu-fill"></span><span class="menu-price">₱160</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">cucumber lime</span><span class="menu-fill"></span><span class="menu-price">₱160</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">very berry</span><span class="menu-fill"></span><span class="menu-price">₱160</span></div>
+                            <div class="menu-row anim-line"><span class="menu-item-name">candied watermelon</span><span class="menu-fill"></span><span class="menu-price">₱160</span></div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cat-title anim-line">premium tea <span class="menu-tag">[NEW]</span></div>
+
+                            <div class="menu-row anim-line"><span class="menu-item-name">twg tea</span><span class="menu-fill"></span><span class="menu-price">₱290</span></div>
+                            <div class="menu-item-desc anim-line">moon &amp; sky / comptoir des / moroccan mint / marrakech mint / grand wedding / singapore breakfast tea</div>
+                            <div class="menu-item-foot anim-line">served with sugar cubes and butter biscuits</div>
+
+                            <div class="menu-rule" aria-hidden="true"></div>
+                            <div class="menu-cut anim-line">✂ — — — — — — — — — — — — — — — — — —</div>
+                            <div class="menu-total anim-line">38 items on file<span class="menu-cursor"></span></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -1349,15 +1745,24 @@
             </div>
 
             <div class="gallery-grid">
-                <div class="blueprint-placeholder">
-                    <img src="IMG_20260214_202629_819 (3)(1).jpg" alt="Gallery 1" style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <div class="blueprint-placeholder">
-                    <span>[ IMG_SOURCE_PENDING ]</span>
-                </div>
-                <div class="blueprint-placeholder">
-                    <span>[ IMG_SOURCE_PENDING ]</span>
-                </div>
+                <a class="blueprint-placeholder" href="images/IMG_20260214_202629_819%20(3)(1).jpg">
+                    <img src="images/IMG_20260214_202629_819%20(3)(1).jpg" alt="Sleepless Grounds — gallery photo 1" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                </a>
+                <a class="blueprint-placeholder" href="images/728675480_18116941123721337_5198761161996999396_n.jpeg">
+                    <img src="images/728675480_18116941123721337_5198761161996999396_n.jpeg" alt="Sleepless Grounds — gallery photo 2" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                </a>
+                <a class="blueprint-placeholder" href="images/728819709_18116941114721337_5040320413297491212_n.jpeg">
+                    <img src="images/728819709_18116941114721337_5040320413297491212_n.jpeg" alt="Sleepless Grounds — gallery photo 3" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                </a>
+                <a class="blueprint-placeholder" href="images/729710554_18116941132721337_2831571033995218013_n.jpeg">
+                    <img src="images/729710554_18116941132721337_2831571033995218013_n.jpeg" alt="Sleepless Grounds — gallery photo 4" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                </a>
+                <a class="blueprint-placeholder" href="images/730001656_18116941141721337_1761956086757903776_n.jpeg">
+                    <img src="images/730001656_18116941141721337_1761956086757903776_n.jpeg" alt="Sleepless Grounds — gallery photo 5" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                </a>
+                <a class="blueprint-placeholder" href="images/732309538_18119415121721337_6439988523164910703_n.jpeg">
+                    <img src="images/732309538_18119415121721337_6439988523164910703_n.jpeg" alt="Sleepless Grounds — gallery photo 6" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                </a>
             </div>
         </div>
     </section>
@@ -2021,92 +2426,110 @@
             });
         });
 
-        // ---- GALLERY FETCH & RENDER (lightGallery) ----
-        async function fetchGallery() {
-            const galleryGrid = document.querySelector('.gallery-grid');
-            if (!galleryGrid) return;
-            
-            // Clear existing placeholders
-            galleryGrid.innerHTML = '';
+        // ---- MENU: print-reveal animation, food/drinks toggle, ambient icon, button flicker ----
+        (function () {
+            const menuWindow = document.getElementById('menu-terminal');
+            if (!menuWindow) return;
 
-            // Helper to capture actual image size for lightGallery's zoom-from-thumbnail animation
-            const setLgSize = (img, a) => {
-                if (img.complete && img.naturalWidth > 0) {
-                    a.setAttribute('data-lg-size', `${img.naturalWidth}-${img.naturalHeight}`);
-                } else {
-                    img.addEventListener('load', () => {
-                        a.setAttribute('data-lg-size', `${img.naturalWidth}-${img.naturalHeight}`);
-                    });
-                }
-            };
+            const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const modeIcon = document.getElementById('menu-mode-icon');
 
-            try {
-                // 1. Fetch from Instagram (up to 6 posts max)
-                const response = await fetch('https://feeds.behold.so/8uxeDETTCRl37Va5Oizd');
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    // Limit to 6 posts
-                    const posts = data.posts.slice(0, 6);
+            function plateSteamSVG() {
+                return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                    <path class="steam" d="M9 3v2"/><path class="steam" d="M12 2.3v2"/><path class="steam" d="M15 3v2"/>
+                    <ellipse cx="12" cy="16.5" rx="8.5" ry="3.2"/>
+                    <ellipse cx="12" cy="16.5" rx="4.6" ry="1.7"/>
+                </svg>`;
+            }
+            function cupSteamSVG() {
+                return `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+                    <path class="steam" d="M9 2.2v2"/><path class="steam" d="M12 1.6v2"/><path class="steam" d="M15 2.2v2"/>
+                    <path d="M4.5 9h13v5a5 5 0 0 1-5 5h-3a5 5 0 0 1-5-5V9z"/>
+                    <path d="M17.5 10.2h1.2a2.3 2.3 0 0 1 0 4.6h-1.2"/>
+                </svg>`;
+            }
+            modeIcon.innerHTML = plateSteamSVG();
 
-                    posts.forEach(post => {
-                        let src = post.mediaUrl;
-                        if (post.mediaType === 'VIDEO' && post.thumbnailUrl) {
-                            src = post.thumbnailUrl;
-                        } else if (post.sizes && post.sizes.large && post.sizes.large.mediaUrl) {
-                            src = post.sizes.large.mediaUrl;
-                        }
-
-                        // We create an `a` tag as wrapper for lightGallery to open it
-                        const a = document.createElement('a');
-                        a.className = 'blueprint-placeholder';
-                        a.href = src; // Source for full lightGallery image
-
-                        const img = document.createElement('img');
-                        img.src = src;
-                        img.alt = post.caption ? post.caption.substring(0, 100) : 'Instagram Gallery Image';
-                        img.loading = 'lazy';
-                        img.style.width = '100%';
-                        img.style.height = '100%';
-                        img.style.objectFit = 'cover';
-
-                        // Set sizes for lightGallery zoom effect
-                        setLgSize(img, a);
-
-                        a.appendChild(img);
-                        galleryGrid.appendChild(a);
-                    });
-                }
-            } catch (error) {
-                console.error('Error fetching gallery:', error);
+            function playLoad() {
+                const lines = menuWindow.querySelectorAll('.menu-panel.active .anim-line');
+                if (REDUCED_MOTION) { gsap.set([menuWindow, ...lines], { clearProps: 'all' }); return; }
+                gsap.set(menuWindow, { opacity: 0, scaleY: 0.97 });
+                gsap.set(lines, { opacity: 0, y: -4 });
+                gsap.timeline()
+                    .to(menuWindow, { opacity: 1, scaleY: 1, duration: 0.25, ease: 'power1.out' })
+                    .to(lines, { opacity: 1, y: 0, duration: 0.12, stagger: 0.02, ease: 'none' });
             }
 
-            // 2. Append additional images from local @[images] folder afterwards
-            const localImages = [
-                'images/IMG_20260214_202629_819%20(3)(1).jpg'
-            ];
+            function playSwitch(targetId) {
+                const lines = document.getElementById(targetId).querySelectorAll('.anim-line');
+                if (REDUCED_MOTION) { gsap.set(lines, { clearProps: 'all' }); return; }
+                gsap.fromTo(lines, { opacity: 0, y: -3 }, { opacity: 1, y: 0, duration: 0.08, stagger: 0.012, ease: 'none' });
+            }
 
-            localImages.forEach(src => {
-                const a = document.createElement('a');
-                a.className = 'blueprint-placeholder';
-                a.href = src;
+            // organic light-bulb flicker + glow on the active category button
+            let flickerTimer = null;
+            function clearFlicker() { if (flickerTimer) { clearTimeout(flickerTimer); flickerTimer = null; } }
+            function runFlicker(el) {
+                if (!el || REDUCED_MOTION) return;
+                gsap.killTweensOf(el);
+                const steps = 3 + Math.floor(Math.random() * 4); // 3-6 stutters, varies each time
+                const tl = gsap.timeline({ onComplete: () => gsap.set(el, { opacity: 1 }) });
+                for (let i = 0; i < steps; i++) {
+                    const dim = 0.25 + Math.random() * 0.4;
+                    const dur = 0.02 + Math.random() * 0.06;
+                    tl.to(el, { opacity: dim, duration: dur, ease: 'none' })
+                      .to(el, { opacity: 1, duration: dur * (0.7 + Math.random() * 0.6), ease: 'none' });
+                }
+            }
+            function scheduleFlicker(first) {
+                if (REDUCED_MOTION) return;
+                clearFlicker();
+                // first flicker after a selection / coming into view always lands within 3s;
+                // every flicker after that settles into a slower, organic 2.5s-7s cadence.
+                const delay = first ? (500 + Math.random() * 2500) : (2500 + Math.random() * 4500);
+                flickerTimer = setTimeout(() => {
+                    runFlicker(menuWindow.querySelector('.menu-opt.active'));
+                    scheduleFlicker(false);
+                }, delay);
+            }
 
-                const img = document.createElement('img');
-                img.src = src;
-                img.alt = 'Sleepless Grounds Local Image';
-                img.loading = 'lazy';
-                img.style.width = '100%';
-                img.style.height = '100%';
-                img.style.objectFit = 'cover';
-
-                // Set sizes for lightGallery zoom effect
-                setLgSize(img, a);
-
-                a.appendChild(img);
-                galleryGrid.appendChild(a);
+            menuWindow.querySelectorAll('.menu-opt').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    menuWindow.querySelectorAll('.menu-opt').forEach(o => { gsap.killTweensOf(o); gsap.set(o, { opacity: 1 }); o.classList.remove('active'); });
+                    menuWindow.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+                    opt.classList.add('active');
+                    const target = opt.dataset.target;
+                    document.getElementById(target).classList.add('active');
+                    playSwitch(target);
+                    modeIcon.innerHTML = target === 'menu-food' ? plateSteamSVG() : cupSteamSVG();
+                    scheduleFlicker(true);
+                });
             });
 
-            // 3. Initialize lightGallery after appending all images
+            ScrollTrigger.create({
+                trigger: menuWindow,
+                start: 'top 85%',
+                once: true,
+                onEnter: () => { playLoad(); scheduleFlicker(true); }
+            });
+        })();
+
+        // ---- GALLERY INIT (lightGallery over local images) ----
+        function initGallery() {
+            const galleryGrid = document.querySelector('.gallery-grid');
+            if (!galleryGrid) return;
+
+            // Capture each image's natural size for lightGallery's zoom-from-thumbnail animation
+            galleryGrid.querySelectorAll('a').forEach(a => {
+                const img = a.querySelector('img');
+                const setLgSize = () => a.setAttribute('data-lg-size', `${img.naturalWidth}-${img.naturalHeight}`);
+                if (img.complete && img.naturalWidth > 0) {
+                    setLgSize();
+                } else {
+                    img.addEventListener('load', setLgSize);
+                }
+            });
+
             if (window.lightGallery) {
                 window.lightGallery(galleryGrid, {
                     plugins: [lgZoom],
@@ -2119,8 +2542,7 @@
             }
         }
 
-        // Call fetchGallery on load
-        document.addEventListener('DOMContentLoaded', fetchGallery);
+        document.addEventListener('DOMContentLoaded', initGallery);
     </script>
 
     <script>
