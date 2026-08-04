@@ -1,0 +1,9 @@
+# Secrets — this repo is PUBLIC. Never commit service-role keys,
+# the Resend API key, or the Turnstile secret key.
+.env
+.env.*
+!.env.example
+
+# Supabase CLI local state
+supabase/.temp/
+supabase/.branches/
