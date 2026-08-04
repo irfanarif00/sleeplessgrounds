@@ -6,7 +6,9 @@
 
 The cafe needs online reservations: weekday nights only, 2PM–2AM, across three seating zones (indoor 30, outdoor 40, rooftop 20). Customers must get an emailed confirmation, the cafe must get a notification, and staff need an admin page to see bookings and control which nights/slots are open — including blacking out dates for private events.
 
-Outcome: two new pages (`reserve.html`, `admin.html`) that look like they were always part of the site, backed by a Supabase project that costs $0/month, with GitHub Pages remaining the only host for anything public.
+Outcome: two new pages (`reserve.html`, `admin.html`) that look like they were always part of the site, backed by a Supabase project that costs $0/month.
+
+A second goal follows from the first. The repo is currently **public**, because GitHub Pages only serves private repos on a paid plan. Once the site holds a booking system, the cafe wants the source private — so the final phase moves hosting to **Cloud Run behind Cloudflare** and switches the repo to private. That migration is sequenced *after* the reservation system ships: changing the host and building the booking flow at the same time makes any failure ambiguous.
 
 ## Decisions (confirmed with user)
 
@@ -26,6 +28,10 @@ Outcome: two new pages (`reserve.html`, `admin.html`) that look like they were a
 | Email | Resend, domain-verified |
 | Bot protection | Cloudflare Turnstile, verified server-side |
 | Timezone | `Asia/Manila` everywhere |
+| Hosting (final) | Cloud Run (`asia-southeast1`), static nginx container, scale-to-zero |
+| Custom domain | Cloudflare proxy + Origin Rule Host override — **not** a load balancer, **not** Cloud Run domain mapping |
+| Repo visibility | Private, after the Cloud Run cutover |
+| Direction videos | Moved to YouTube unlisted embeds; no longer served from origin |
 
 ## Architecture
 
@@ -253,6 +259,7 @@ Each phase ends in something verifiable. Follow TDD where there's logic to test 
 4. **`reserve.html` + `assets/sg-base.css` + `reserve.js`.** Point at the local Supabase first. Check mobile width, keyboard tab order, `prefers-reduced-motion`, and that a 409 mid-flow surfaces a readable message.
 5. **`admin.html` + `admin.js`.** Create the first admin user, disable signups, confirm RLS by signing out and retrying every read.
 6. **Integrate and harden.** `index.html` nav/CTA/copy edits, `.github/workflows/keepalive.yml` (daily `get_availability` ping), production secrets, real Turnstile keys, Resend domain live.
+7. **Migrate hosting to Cloud Run, then make the repo private.** Detailed below. Deliberately last — the reservation system must be proven working on the current host first, so that if something breaks after the cutover it is unambiguously the cutover.
 
 ## Manual setup you'll need to do
 
@@ -275,11 +282,104 @@ Each phase ends in something verifiable. Follow TDD where there's logic to test 
 
 ## Cost
 
-$0/month. Supabase free tier (pauses only after ~7 days of zero DB traffic — the daily ping prevents it), Resend free tier (3,000/mo, **capped at 100/day** — the ceiling to watch, since each booking sends 2 emails, so ~50 bookings/day), Turnstile free, GitHub Pages and Actions free. The first real cost only arrives at Supabase Pro ($25/mo), and only if the cafe outgrows the free database or wants the pause guarantee without the cron ping.
+$0/month, before and after the migration.
+
+- **Supabase** free tier — pauses only after ~7 days of zero DB traffic, which the daily ping prevents.
+- **Resend** free tier — 3,000/mo but **capped at 100/day**. This is the ceiling to watch: each booking sends 2 emails, so ~50 bookings/day.
+- **Turnstile**, **Cloudflare** proxy/cache, **GitHub Actions** — free.
+- **Cloud Run** — free tier covers 2M requests/month. Egress is free only for the first 1 GB/month, then $0.12/GB, which is precisely why the videos move to YouTube; without that, the MP4s were the one line item that could produce a surprise bill. Artifact Registry's 0.5 GB free tier comfortably holds a ~15 MB image.
+
+First real cost would be Supabase Pro ($25/mo), and only if the cafe outgrows the free database or wants the no-pause guarantee without the cron ping.
+
+## Phase 7 — Move hosting to Cloud Run, make the repo private
+
+Runs only after the reservation system is live and verified on GitHub Pages.
+
+### Why not just keep Pages
+
+GitHub Pages serves a private repo only on a paid plan, and **even then the published site stays public** — repo visibility and site visibility are separate things. So paying doesn't buy privacy of the site, only of the source.
+
+| Path | Monthly | Verdict |
+|---|---|---|
+| **Cloud Run + Cloudflare proxy** | ~$0 | **Chosen.** Free tier covers the traffic; Cloudflare absorbs repeat requests |
+| GitHub Pro + Pages | $4 | Works and needs zero migration — noted for the record, but keeps hosting off GCP |
+| Cloud Run + global external ALB | ~$18+ | Rejected. The forwarding rule alone costs more than every alternative |
+| Firebase Hosting | $0 | Rejected. 360 MB/day transfer cap; ~5 visitors/day would exhaust it at current asset weight |
+
+### The container is an allowlist, not a copy of the repo
+
+This is the load-bearing detail. A container that serves the repo root would serve **`.plans/reservation-system-plan.md`** — the dot-directory exclusion protecting it today is *Jekyll behavior*, and Jekyll disappears with Pages. It would also keep serving the ~145 MB of files the site never references, which Pages is already exposing today: `verification_*.png` (dev screenshots), `benchmark.html`, `Gemini_Generated_Image_*.png`, `verify_glassmorphism.py`, `.DS_Store`, `menu-images/`, `background-image.png`, `sleepless-grounds-logo.png`, and two unreferenced menu PDFs (24 MB + 9.1 MB).
+
+A grep of every `src`, `href` and CSS `url()` in `index.html` shows the site actually serves only these:
+
+```dockerfile
+FROM nginx:1.29-alpine
+COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /usr/share/nginx/html
+COPY index.html reserve.html admin.html logo-cropped.png ./
+COPY assets/ ./assets/
+COPY images/ ./images/
+```
+
+That is the whole site — ~4.5 MB, image ~15 MB. Nothing is deleted from git; the unreferenced files stay archived in the repo and simply stop being published. Re-run the reference grep before finalising, and add `location ~ /\. { deny all; return 404; }` to `nginx.conf` as a second layer so no dotfile is ever reachable even if the allowlist grows sloppy.
+
+`nginx.conf` also needs: `listen 8080` (Cloud Run's `$PORT`), long `Cache-Control` on `images/` and `assets/`, short on the HTML, and `gzip on`.
+
+### Cloud Run service
+
+```
+gcloud run deploy sg-site --region asia-southeast1 \
+  --min-instances=0 --max-instances=3 --memory=128Mi --cpu=1 \
+  --port=8080 --allow-unauthenticated
+```
+
+`min-instances=0` keeps idle cost at zero at the price of a cold start (~1s for nginx) for whoever arrives after a quiet spell. With Cloudflare caching in front, most requests never reach the origin, so cold starts are rare — accept them rather than pay for a warm instance.
+
+### Custom domain — Cloudflare proxy, not domain mapping
+
+Cloud Run's native domain mapping is supported in `asia-southeast1`, but Google still labels it preview and explicitly "not production-ready" on latency grounds, and Cloudflare blocks its ACME validation — which would force the orange cloud **off**, losing the edge caching that keeps egress near zero. Every renewal would re-open that footgun. Rejected.
+
+Instead:
+
+1. `www` → CNAME to `sg-site-xxxx.asia-southeast1.run.app`, **proxied** (orange cloud).
+2. An **Origin Rule** with *Host Header Override* set to that same `run.app` hostname. Without this, Cloud Run receives `Host: www.sleeplessgrounds.coffee`, doesn't recognise it, and returns 404 — this single rule is the difference between a working site and a blank 404. Note it is an **Origin** Rule; Transform Rules cannot set the Host header.
+3. Cache Rules covering `images/*` and `assets/*` with a long edge TTL.
+4. Keep the existing apex → `www` redirect.
+5. Delete the repo's `CNAME` file (a Pages-only artifact), then **turn Pages off** in repo settings so two origins can't serve stale copies.
+
+Cut over by leaving Pages live until the Cloud Run URL is verified directly, then flipping DNS. Rollback is one DNS change.
+
+### Videos move to YouTube
+
+The three MP4s (43 + 26 + 31 MB) leave the origin and become unlisted YouTube embeds in the directions tabs. Three reasons, in order of weight: Cloudflare Free's ToS §2.8 restricts caching large volumes of video, so edge caching cannot honestly be relied on to absorb them; Cloud Run egress is free only for the first 1 GB/month and then bills at $0.12/GB; and a 43 MB non-adaptive MP4 is punishing on Philippine mobile data, which YouTube's adaptive bitrate fixes outright. Keep the `.brutal-tab` switcher exactly as it is — only the panel contents change, and the iframes should be `loading="lazy"` so they don't cost anything until a tab is opened.
+
+### Deploy pipeline
+
+`.github/workflows/deploy.yml` — on push to `main`: authenticate via **Workload Identity Federation** (`google-github-actions/auth@v2`), build, push to Artifact Registry, `gcloud run deploy`. No service-account JSON key in the repo — it is about to hold real secrets, and a long-lived key there is the worst thing in this plan if it leaks.
+
+Private repos get 2,000 free Actions minutes/month instead of unlimited. A ~2-minute deploy plus the ~10-second daily keepalive lands far under that.
+
+### What does not change
+
+Nothing about Supabase, the Edge Functions, CORS, Turnstile or Resend — the origin hostname stays `www.sleeplessgrounds.coffee` throughout, so every allowlist and site key remains valid. The keepalive workflow is unaffected.
+
+### The warning that matters
+
+**A private repo is not a security control for `admin.html`.** The deployed site stays fully public on Cloud Run exactly as it is on Pages, so anyone can still fetch `admin.html` and read `sg-config.js`. The only things protecting customer data are the `anon` role having no grants on `bookings` and the RLS policies gated on `admin_users` — unchanged, and still the entire boundary. Do not let "the repo is private now" become a reason to loosen either.
+
+### Verification
+
+- `curl` the `run.app` URL directly: `index.html` 200, `/.plans/reservation-system-plan.md` **404**, `/benchmark.html` **404**, `/verification_gallery.png` **404**.
+- After DNS cutover, the same checks against `https://www.sleeplessgrounds.coffee` — plus confirm it is *not* a 404 on the homepage, which is what a missing Origin Rule looks like.
+- Book a reservation end to end on the new origin to prove CORS and Turnstile still pass.
+- Confirm Pages is disabled and `irfanarif00.github.io/sleeplessgrounds/` no longer serves the site.
+- Flip the repo to private, then re-run the booking flow — it must be unaffected, proving nothing depended on repo visibility.
 
 ## Deliberately out of scope
 
 Deposits and online payment; SMS reminders; waitlists; recurring/series bookings; a customer account system; walk-in/POS integration; multi-language. Self-service *editing* is also out — cancel-and-rebook covers it with far less surface area. The `cancel_token` column is added now so a fuller self-service page can be built later without a migration.
+
+Also out: moving the booking API off Supabase Edge Functions onto Cloud Run. Once Cloud Run exists it becomes technically possible to consolidate, but Postgres still has to live on Supabase, so it would trade one platform for two moving parts and re-open a decision already made. Deleting the ~145 MB of unreferenced files from git is likewise out of scope — the container allowlist stops publishing them, which is the part that matters.
 
 ## Known follow-up
 
