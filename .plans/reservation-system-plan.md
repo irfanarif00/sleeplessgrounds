@@ -8,7 +8,7 @@ The cafe needs online reservations: weekday nights only, 2PM–2AM, across three
 
 Outcome: two new pages (`reserve.html`, `admin.html`) that look like they were always part of the site, backed by a Supabase project that costs $0/month.
 
-A second goal follows from the first. The repo is currently **public**, because GitHub Pages only serves private repos on a paid plan. Once the site holds a booking system, the cafe wants the source private — so the final phase moves hosting to **Cloud Run behind Cloudflare** and switches the repo to private. That migration is sequenced *after* the reservation system ships: changing the host and building the booking flow at the same time makes any failure ambiguous.
+A second goal follows from the first. The repo is currently **public**, because GitHub Pages only serves private repos on a paid plan. Once the site holds a booking system, the cafe wants the source private — so the final phase moves hosting to **Cloud Run** and switches the repo to private. That migration is sequenced *after* the reservation system ships: changing the host and building the booking flow at the same time makes any failure ambiguous.
 
 ## Decisions (confirmed with user)
 
@@ -29,7 +29,7 @@ A second goal follows from the first. The repo is currently **public**, because 
 | Bot protection | Cloudflare Turnstile, verified server-side |
 | Timezone | `Asia/Manila` everywhere |
 | Hosting (final) | Cloud Run (`asia-southeast1`), static nginx container, scale-to-zero |
-| Custom domain | Cloudflare proxy + Origin Rule Host override — **not** a load balancer, **not** Cloud Run domain mapping |
+| Custom domain | Cloud Run domain mapping, Cloudflare DNS-only (grey cloud) — **not** a load balancer, **not** a Cloudflare proxy |
 | Repo visibility | Private, after the Cloud Run cutover |
 | Direction videos | Moved to YouTube unlisted embeds; no longer served from origin |
 
@@ -265,7 +265,7 @@ Each phase ends in something verifiable. Follow TDD where there's logic to test 
 
 1. Supabase project, region **ap-southeast-1 (Singapore)**. Set the DB timezone expectations to `Asia/Manila` in code (store `timestamptz`, convert at the edges).
 2. Resend account → verify **`send.sleeplessgrounds.coffee`** → add its DKIM/SPF records in Cloudflare. Do not touch the apex SPF/MX that Workspace uses.
-3. Cloudflare Turnstile → new site for `www.sleeplessgrounds.coffee` → site key (public, goes in `sg-config.js`) + secret key (function secret).
+3. Cloudflare Turnstile → new widget for `www.sleeplessgrounds.coffee`, **Managed** mode → site key (public, goes in `sg-config.js`) + secret key (function secret). Turnstile is independent of your DNS/proxy settings, so this is unaffected by the Cloud Run migration and needs no revisiting at cutover.
 4. In Supabase Auth: create the staff account(s), insert matching rows into `admin_users`, and **turn off public signups**.
 5. Set the four Edge Function secrets.
 6. Fill `settings.notify_emails` with the addresses that should receive booking alerts.
@@ -286,8 +286,9 @@ $0/month, before and after the migration.
 
 - **Supabase** free tier — pauses only after ~7 days of zero DB traffic, which the daily ping prevents.
 - **Resend** free tier — 3,000/mo but **capped at 100/day**. This is the ceiling to watch: each booking sends 2 emails, so ~50 bookings/day.
-- **Turnstile**, **Cloudflare** proxy/cache, **GitHub Actions** — free.
-- **Cloud Run** — free tier covers 2M requests/month. Egress is free only for the first 1 GB/month, then $0.12/GB, which is precisely why the videos move to YouTube; without that, the MP4s were the one line item that could produce a surprise bill. Artifact Registry's 0.5 GB free tier comfortably holds a ~15 MB image.
+- **Turnstile**, **Cloudflare DNS**, **GitHub Actions** — free. (No Cloudflare proxy/cache under the DNS-only choice.)
+- **Cloud Run** — free tier covers 2M requests/month. Egress is free only for the first 1 GB/month, then $0.12/GB, which is precisely why the videos move to YouTube; without that, the MP4s were the one line item that could produce a surprise bill. Artifact Registry's 0.5 GB free tier holds a ~15 MB image, with a keep-last-5 cleanup policy so it stays there.
+- **Cloud Run domain mapping** and its Google-managed TLS certificate — free.
 
 First real cost would be Supabase Pro ($25/mo), and only if the cafe outgrows the free database or wants the no-pause guarantee without the cron ping.
 
@@ -301,7 +302,8 @@ GitHub Pages serves a private repo only on a paid plan, and **even then the publ
 
 | Path | Monthly | Verdict |
 |---|---|---|
-| **Cloud Run + Cloudflare proxy** | ~$0 | **Chosen.** Free tier covers the traffic; Cloudflare absorbs repeat requests |
+| **Cloud Run + domain mapping (DNS-only)** | ~$0 | **Chosen.** Free tier covers the traffic; egress is pennies once the videos are off the origin |
+| Cloud Run + Cloudflare Worker proxy | ~$0 | Escape hatch. Keeps the edge cache and WAF, at the cost of custom code in the request path |
 | GitHub Pro + Pages | $4 | Works and needs zero migration — noted for the record, but keeps hosting off GCP |
 | Cloud Run + global external ALB | ~$18+ | Rejected. The forwarding rule alone costs more than every alternative |
 | Firebase Hosting | $0 | Rejected. 360 MB/day transfer cap; ~5 visitors/day would exhaust it at current asset weight |
@@ -333,29 +335,66 @@ gcloud run deploy sg-site --region asia-southeast1 \
   --port=8080 --allow-unauthenticated
 ```
 
-`min-instances=0` keeps idle cost at zero at the price of a cold start (~1s for nginx) for whoever arrives after a quiet spell. With Cloudflare caching in front, most requests never reach the origin, so cold starts are rare — accept them rather than pay for a warm instance.
+`min-instances=0` keeps idle cost at zero at the price of a cold start (~1s for nginx) for whoever arrives after a quiet spell. With no CDN in front, every visitor hits the origin, so cold starts will be user-visible on a quiet afternoon rather than rare. That is the main cost of the DNS-only choice — nginx serving a 4.5 MB static site starts fast, so measure it after cutover and only pay for `min-instances=1` if it actually reads as slow.
 
-### Custom domain — Cloudflare proxy, not domain mapping
+### Custom domain — Cloud Run domain mapping, DNS-only
 
-Cloud Run's native domain mapping is supported in `asia-southeast1`, but Google still labels it preview and explicitly "not production-ready" on latency grounds, and Cloudflare blocks its ACME validation — which would force the orange cloud **off**, losing the edge caching that keeps egress near zero. Every renewal would re-open that footgun. Rejected.
+**Chosen: Cloud Run's native domain mapping, with Cloudflare set to DNS-only (grey cloud).**
 
-Instead:
+The alternative — proxying through Cloudflare — was investigated and rejected on a hard blocker: making Cloud Run answer to `www.sleeplessgrounds.coffee` through an orange-cloud proxy requires overriding the `Host` header, and Origin Rules' *Host Header Override* is **Enterprise-only**. Pro and Business zones get a "not entitled" error. The only free workarounds are a Cloudflare Worker or Snippet acting as a reverse proxy, which puts custom code permanently in front of the site.
 
-1. `www` → CNAME to `sg-site-xxxx.asia-southeast1.run.app`, **proxied** (orange cloud).
-2. An **Origin Rule** with *Host Header Override* set to that same `run.app` hostname. Without this, Cloud Run receives `Host: www.sleeplessgrounds.coffee`, doesn't recognise it, and returns 404 — this single rule is the difference between a working site and a blank 404. Note it is an **Origin** Rule; Transform Rules cannot set the Host header.
-3. Cache Rules covering `images/*` and `assets/*` with a long edge TTL.
+Grey-clouding costs very little here, and the earlier objection to it no longer applies. Losing Cloudflare's edge cache mattered only while the origin was serving 100 MB of MP4; with the videos on YouTube the site is ~4.5 MB of HTML and images, so origin egress runs to pennies per month. Going DNS-only also removes the ACME-renewal footgun entirely — Cloudflare blocking Google's certificate validation was only ever a problem *because* the proxy was on. With the orange cloud off by design, there is nothing to disable at renewal.
+
+Setup:
+
+1. `gcloud beta run domain-mappings create --service sg-site --domain www.sleeplessgrounds.coffee --region asia-southeast1`. `asia-southeast1` is one of the supported regions.
+2. Add the CNAME/A records Google returns, in Cloudflare, **grey cloud (DNS-only)**. Orange cloud will break certificate provisioning.
+3. Wait for Google-managed TLS to provision (minutes to ~24h). Do not proceed until the mapping reports the certificate as active.
 4. Keep the existing apex → `www` redirect.
-5. Delete the repo's `CNAME` file (a Pages-only artifact), then **turn Pages off** in repo settings so two origins can't serve stale copies.
 
-Cut over by leaving Pages live until the Cloud Run URL is verified directly, then flipping DNS. Rollback is one DNS change.
+Two things to accept going in: Google labels domain mapping **preview and "not production-ready"** on latency grounds, so expect some added latency versus a load balancer; and the site loses Cloudflare's WAF, Bot Fight Mode and L7 DDoS protection. That last one is tolerable because the static site has no forms and no database behind it — see the bot-protection section below for why it does not weaken the booking flow. Cloud Run sits behind Google's own front end, and `max-instances=3` caps runaway spend under a flood.
+
+If the preview status or latency later proves unacceptable, the escape hatch is the Worker-proxy route, not the $18/mo load balancer.
+
+### Cutover order — outage-safe
+
+Sequence matters; a wrong order takes the live site down.
+
+1. Swap the three direction videos to YouTube embeds and merge. **This must land before the container is built** — the allowlist Dockerfile omits the MP4s, so building first leaves the directions tabs silently broken: the `.brutal-tab` switcher still works, the video just never appears, and no automated check catches it.
+2. Deploy to Cloud Run and verify against the raw `run.app` URL, while Pages is still live and serving the domain.
+3. Create the domain mapping, add the DNS records grey-clouded, wait for the certificate.
+4. Verify `https://www.sleeplessgrounds.coffee` fully, including a real booking.
+5. **Only then** delete the repo's `CNAME` file (a Pages-only artifact) and disable Pages in repo settings, so two origins can't serve divergent copies.
+6. Flip the repo to private last.
+
+Rollback at any point up to step 5 is a DNS change, because Pages is still configured. After step 5 it means re-enabling Pages, so do not run step 5 until step 4 is genuinely clean.
 
 ### Videos move to YouTube
 
-The three MP4s (43 + 26 + 31 MB) leave the origin and become unlisted YouTube embeds in the directions tabs. Three reasons, in order of weight: Cloudflare Free's ToS §2.8 restricts caching large volumes of video, so edge caching cannot honestly be relied on to absorb them; Cloud Run egress is free only for the first 1 GB/month and then bills at $0.12/GB; and a 43 MB non-adaptive MP4 is punishing on Philippine mobile data, which YouTube's adaptive bitrate fixes outright. Keep the `.brutal-tab` switcher exactly as it is — only the panel contents change, and the iframes should be `loading="lazy"` so they don't cost anything until a tab is opened.
+The three MP4s (43 + 26 + 31 MB) leave the origin and become unlisted YouTube embeds in the directions tabs. This is now **load-bearing rather than an optimisation**: with DNS-only there is no CDN in front, so every byte is billed origin egress, free only for the first 1 GB/month and then $0.12/GB. Three self-hosted videos would be the one line item capable of producing a surprise invoice. Independently, a 43 MB non-adaptive MP4 is punishing on Philippine mobile data, which YouTube's adaptive bitrate fixes outright.
+
+Keep the `.brutal-tab` switcher exactly as it is — only the panel contents change — and give the iframes `loading="lazy"` so they cost nothing until a tab is opened.
+
+### Turnstile is unaffected by any of this
+
+**Going DNS-only does not weaken bot protection, and Turnstile keeps working exactly as specified.** Cloudflare's docs are explicit: *"Turnstile is designed to be an independent service. You can use Turnstile on any website, regardless of whether it is proxied through the Cloudflare network."* It works on other CDNs, other clouds, and on-prem. Configuration is unchanged — register `www.sleeplessgrounds.coffee` in the widget's hostname allowlist, embed the widget, verify the token server-side.
+
+The reason grey-clouding costs nothing here: **the booking endpoint was never inside the Cloudflare zone.** It is a Supabase Edge Function on `*.supabase.co`, a different domain that the zone's proxy settings have never touched. Turning the orange cloud off on `www` changes nothing about the path an attacker would actually target.
+
+What defends the booking flow, identical under either domain choice:
+
+1. **Turnstile** widget on `reserve.html`, token verified against `siteverify` inside `create-booking`. Use **Managed** mode — invisible for the large majority of visitors rather than showing a checkbox.
+2. **Per-IP rate limit** in the Edge Function.
+3. **`anon` has no grants on `bookings`** — a bot holding a valid token can still only reach the one RPC.
+4. **Honeypot + minimum time-to-submit** (new): a hidden input real users never fill, plus rejecting submissions faster than ~3 seconds. Catches naive bots at zero cost and zero user friction. Both checks belong in the Edge Function, not the client.
+
+**The CORS allowlist is not bot protection.** It is worth keeping — it stops other sites embedding the form — but CORS is enforced by the browser, and a script can send any `Origin` header it likes. Turnstile, the rate limit and the honeypot are the real controls. Do not treat the allowlist as one of them.
 
 ### Deploy pipeline
 
 `.github/workflows/deploy.yml` — on push to `main`: authenticate via **Workload Identity Federation** (`google-github-actions/auth@v2`), build, push to Artifact Registry, `gcloud run deploy`. No service-account JSON key in the repo — it is about to hold real secrets, and a long-lived key there is the worst thing in this plan if it leaks.
+
+Add an Artifact Registry **cleanup policy keeping the last 5 images**. The free tier is 0.5 GB and each image is ~15 MB, so roughly 33 deploys silently crosses into billing — months away, and exactly the sort of line item nobody notices until the invoice.
 
 Private repos get 2,000 free Actions minutes/month instead of unlimited. A ~2-minute deploy plus the ~10-second daily keepalive lands far under that.
 
@@ -369,9 +408,12 @@ Nothing about Supabase, the Edge Functions, CORS, Turnstile or Resend — the or
 
 ### Verification
 
-- `curl` the `run.app` URL directly: `index.html` 200, `/.plans/reservation-system-plan.md` **404**, `/benchmark.html` **404**, `/verification_gallery.png` **404**.
-- After DNS cutover, the same checks against `https://www.sleeplessgrounds.coffee` — plus confirm it is *not* a 404 on the homepage, which is what a missing Origin Rule looks like.
-- Book a reservation end to end on the new origin to prove CORS and Turnstile still pass.
+- `curl` the `run.app` URL directly: `index.html` 200, and `/.plans/reservation-system-plan.md`, `/benchmark.html`, `/verification_gallery.png` all **404**. Run this *before* touching DNS.
+- **Open all three direction tabs and confirm each YouTube iframe actually plays.** The allowlist drops the MP4s, so a missed embed fails silently — the tab switches and the panel is simply empty.
+- Confirm the domain mapping reports its certificate **active** before cutover; grey cloud is required or provisioning fails.
+- After cutover, repeat the curl checks against `https://www.sleeplessgrounds.coffee`.
+- Book a reservation end to end on the new origin to prove Turnstile and the Edge Function path still pass.
+- Measure homepage load after a few minutes of idle — this is the cold-start cost of `min-instances=0` with no CDN, and the number that decides whether a warm instance is worth paying for.
 - Confirm Pages is disabled and `irfanarif00.github.io/sleeplessgrounds/` no longer serves the site.
 - Flip the repo to private, then re-run the booking flow — it must be unaffected, proving nothing depended on repo visibility.
 
